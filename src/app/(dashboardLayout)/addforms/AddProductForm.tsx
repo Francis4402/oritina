@@ -1,13 +1,13 @@
 "use client"
 
 
-import { categorytype } from '@/app/types/Types'
+import { category } from '@/app/types/Types'
 import { ProductValidation, productValidationSchema } from '@/app/zodvalidation/productformvalidation'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { createProduct } from '@/services/Product'
 import { getProductCategory } from '@/services/ProductCategory'
@@ -21,7 +21,7 @@ import { toast } from 'sonner'
 const AddProductForm = () => {
   const [open, setOpen] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [category, setCategory] = useState<categorytype[]>([]);
+  const [category, setCategory] = useState<category[]>([]);
 
   useEffect(() => {
     getProductCategory().then(res => {
@@ -212,7 +212,7 @@ const AddProductForm = () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {category.map((item: categorytype) => (
+                    {category.map((item: category) => (
                       <SelectItem key={item?.id} value={item?.category}>
                         {item?.category}
                       </SelectItem>

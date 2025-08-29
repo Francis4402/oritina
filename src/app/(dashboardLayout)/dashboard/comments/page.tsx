@@ -2,6 +2,7 @@ import { getComments } from '@/services/Comment'
 import React from 'react'
 import CommentTable from './CommentTable';
 
+
 const Comments = async () => {
 
   const comments = await getComments();

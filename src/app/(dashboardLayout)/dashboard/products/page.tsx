@@ -3,7 +3,6 @@ import ProductTable from './ProductTable';
 import AddProductForm from '../../addforms/AddProductForm';
 
 
-
 const Products = async () => {
 
   const product = await getProducts();

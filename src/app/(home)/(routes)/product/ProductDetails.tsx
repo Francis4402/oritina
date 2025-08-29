@@ -49,12 +49,6 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
 
     return (
         <div className="container mx-auto px-4 py-8 poppins max-w-6xl">
-            {/* Breadcrumb */}
-            <div className="text-sm text-muted-foreground mb-6">
-                <Link href="/" className="hover:text-primary">Home</Link> / 
-                <Link href={`/category/${productData.category}`} className="hover:text-primary"> {productData.category}</Link> / 
-                <span className="font-medium"> {productData.name}</span>
-            </div>
             
             <div className="grid md:grid-cols-2 gap-8">
                 {/* Product Images Section */}

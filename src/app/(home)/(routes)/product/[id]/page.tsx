@@ -4,6 +4,16 @@ import { ProductDetails } from "../ProductDetails";
 import { product } from "@/app/types/Types";
 
 
+export async function generateMetadata({params}: {params: Promise<{id: string}>}) {
+  const {id} = await params;
+  const product = await getProduct(id);
+  const productData: product = product.data[0];
+
+  return {
+    title: productData.name,
+    description: productData.description,
+  };
+}
 
 
 const ProductDetailsPage = async ({params}: {params: Promise<{id: string}>}) => {
@@ -11,7 +21,7 @@ const ProductDetailsPage = async ({params}: {params: Promise<{id: string}>}) => 
   const product = await getProduct(id);
   const productData: product = product.data[0];
   
-  // Fetch related products
+  
   const products = await getProducts();
   const relatedProducts = products.filter((product: product) => 
       product.category === productData.category && product.id !== productData.id
