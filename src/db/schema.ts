@@ -1,5 +1,5 @@
 
-import { pgEnum, text, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum('user_role', ['User', 'Admin']);
 
@@ -17,10 +17,12 @@ export const usersTable = pgTable("users", {
 export const productsTable = pgTable("products", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar({ length: 255 }).notNull(),
-  description: text("description").array().notNull(),
-  price: varchar({ length: 255 }).notNull(),
+  description: text("description").notNull(),
+  price: integer("price").notNull(),
   productImage: text("product_image").array().notNull(),
+  color: varchar({ length: 255 }).array().notNull(),
   category: varchar({ length: 255 }).notNull(),
+  producttype: varchar({ length: 255 }).notNull(),
   totalRating: varchar({ length: 255 }),
   reviews: varchar({ length: 255 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -29,7 +31,6 @@ export const productsTable = pgTable("products", {
 
 export const categoriesTable = pgTable("categories", {
   id: uuid("id").primaryKey().defaultRandom(),
-  productId: uuid("product_id").references(() => productsTable.id).notNull(),
   category: varchar({ length: 255 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -38,9 +39,9 @@ export const categoriesTable = pgTable("categories", {
 export const blogsTable = pgTable("blogs", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar({ length: 255 }).notNull(),
-  description: text("description").array().notNull(),
-  blogImage: text("blog_image").array().notNull(),
-  authorId: uuid("user_id").references(() => usersTable.id).notNull(),
+  description: text("description").notNull(),
+  blogImage: text("blog_image").notNull(),
+  blogtype: varchar("blog_type", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

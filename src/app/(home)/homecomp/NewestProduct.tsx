@@ -1,33 +1,31 @@
+
+import { product } from '@/app/types/Types';
 import { Button } from '@/components/ui/button'
+import { getProducts } from '@/services/Product'
 import Image from 'next/image'
 
 
-const NewestProduct = () => {
+const NewestProduct = async () => {
 
-    const cloths = [
-        {
-            cloth: "/clothimage/imgitems1.png",
-            color: "bg-orange-300"
-        },
-        {
-            cloth: "/clothimage/imgitems2.png",
-            color: "bg-red-200"
-        },
-        {
-            cloth: "/clothimage/imgitems3.png",
-            color: "bg-gray-300"
-        }
-    ]
+    const cloths = await getProducts();
+
+    const newest = cloths
+    .filter((c: product) => c.producttype === 'newarrivals')
+    .slice(0, 3);
 
   return (
     <div className='grid md:grid-cols-3'>
         {
-            cloths.map((c, index) => (
-                <div className={`${c.color} flex flex-col items-center justify-center p-4 w-full`} key={index}>
-                    <Image src={c.cloth} alt="T-shirt" width={600} height={600} />
-                    <Button>Shop Button</Button>
-                </div>
-            ))
+            newest.map((c: product, index: number) => {
+                return (
+                    c.producttype === 'newarrivals' ? (
+                        <div className={`${c.color} flex flex-col items-center justify-center p-4 w-full`} key={index}>
+                            <Image src={c.productImage[0]} alt="T-shirt" width={600} height={600} />
+                            <Button>Shop Button</Button>
+                        </div>
+                    ) : ""
+                )
+            })
         }
     </div>
   )

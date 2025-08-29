@@ -3,7 +3,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'
 import { CalendarDays, Clock, Search, User, Heart, MessageCircle, Share, ArrowRight } from 'lucide-react'
@@ -135,17 +134,10 @@ const Blogs = () => {
               <CardDescription className="text-lg mb-6">{featuredPost.excerpt}</CardDescription>
               
               <div className="flex items-center gap-4 mb-6">
-                <Avatar>
-                  <AvatarImage src={featuredPost.avatar} />
-                  <AvatarFallback>{featuredPost.author[0]}</AvatarFallback>
-                </Avatar>
                 <div>
-                  <p className="font-medium">{featuredPost.author}</p>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <CalendarDays className="h-4 w-4 mr-1" />
                     <span className="mr-4">{featuredPost.date}</span>
-                    <Clock className="h-4 w-4 mr-1" />
-                    <span>{featuredPost.readTime}</span>
                   </div>
                 </div>
               </div>
@@ -183,19 +175,10 @@ const Blogs = () => {
               </CardHeader>
               
               <CardContent className="flex-grow">
-                <div className="flex items-center gap-3 mb-4">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={post.avatar} />
-                    <AvatarFallback>{post.author[0]}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium">{post.author}</span>
-                </div>
-                
+                                
                 <div className="flex items-center text-sm text-muted-foreground">
                   <CalendarDays className="h-4 w-4 mr-1" />
                   <span className="mr-4">{post.date}</span>
-                  <Clock className="h-4 w-4 mr-1" />
-                  <span>{post.readTime}</span>
                 </div>
               </CardContent>
               

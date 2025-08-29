@@ -1,7 +1,7 @@
 import CarouselHome from "./homecomp/CarouselHome";
 import Logos from "./homecomp/Logos";
 import NewestProduct from "./homecomp/NewestProduct";
-import ProductShow from "./homecomp/ProductShow";
+import ProductPage from "./homecomp/ProductPage";
 import Services from "./homecomp/Services";
 
 
@@ -11,7 +11,7 @@ export default function Home() {
       <CarouselHome />
       <Logos/>
       <NewestProduct/>
-      <ProductShow/>
+      <ProductPage />
       <Services />
     </div>
   );

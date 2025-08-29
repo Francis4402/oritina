@@ -3,6 +3,9 @@ import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
+import Provider from "./Provider/Provider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./utils/authOptions";
 
 
 
@@ -34,6 +37,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -44,8 +48,10 @@ export default async function RootLayout({
             defaultTheme="light"
             enableSystem
             disableTransitionOnChange>
-              <Toaster position="top-right" />
-              {children}
+              <Provider session={session}>
+                <Toaster position="top-right" />
+                {children}
+              </Provider>
         </ThemeProvider>
       </body>
     </html>

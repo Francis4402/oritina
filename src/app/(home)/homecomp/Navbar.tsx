@@ -7,10 +7,15 @@ import { ModeToggle } from '../../utils/ModeToggle';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const {data: session} = useSession();
 
 
   const navLinks = [
@@ -35,7 +40,7 @@ const Navbar = () => {
   const router = useRouter();
 
   const handleRouteSignIn = () => {
-    router.push("/signin");
+    router.push("/login");
   }
 
   return (
@@ -86,8 +91,40 @@ const Navbar = () => {
             <div className="hidden md:block">
               <ModeToggle />
             </div>
-            <Button variant={"outline"} onClick={handleRouteSignIn}>Sign In</Button>
-            <Button variant={"outline"}>SignOut</Button>
+            {session?.user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar>
+                    <AvatarImage src={session.user.image ? session.user.image : ""} />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='poppins'>
+                  <DropdownMenuItem>
+                    {session.user.name}
+                  </DropdownMenuItem>
+                  {
+                    session.user.role === "Admin" ? (
+                      <DropdownMenuItem>
+                        <Link href={"/dashboard"}>
+                          Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    ) : (
+                      ""
+                    )
+                  }
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/login">
+                <Button variant="default">Login</Button>
+              </Link>
+            )}
+            
           </div>
         </div>
 
