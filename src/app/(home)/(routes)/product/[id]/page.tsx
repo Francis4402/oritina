@@ -23,7 +23,7 @@ const ProductDetailsPage = async ({params}: {params: Promise<{id: string}>}) => 
   
   
   const products = await getProducts();
-  const relatedProducts = products.filter((product: product) => 
+  const relatedProducts = products.data.filter((product: product) => 
       product.category === productData.category && product.id !== productData.id
   ).slice(0, 4);
 

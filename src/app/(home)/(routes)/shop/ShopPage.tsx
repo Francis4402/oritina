@@ -209,15 +209,7 @@ const ShopPage = ({products}: {products: product[]}) => {
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center mt-8">
-            <div className="flex gap-2">
-              <Button variant="outline" disabled>Previous</Button>
-              <Button variant="default">1</Button>
-              <Button variant="outline">2</Button>
-              <Button variant="outline">3</Button>
-              <Button variant="outline">Next</Button>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>

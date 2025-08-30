@@ -5,7 +5,7 @@ import AddProductForm from '../../addforms/AddProductForm';
 
 const Products = async () => {
 
-  const product = await getProducts();
+  const {data: product} = await getProducts();
 
 
   return (

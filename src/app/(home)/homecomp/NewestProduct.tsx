@@ -9,13 +9,13 @@ const NewestProduct = async () => {
 
     const cloths = await getProducts();
 
-    const newest = cloths
-    .filter((c: product) => c.producttype === 'newarrivals')
-    .slice(0, 3);
+    // const newest = cloths
+    // .filter((c: product) => c.producttype === 'newarrivals')
+    // .slice(0, 3);
 
   return (
     <div className='grid md:grid-cols-3'>
-        {
+        {/* {
             newest.map((c: product, index: number) => {
                 return (
                     c.producttype === 'newarrivals' ? (
@@ -26,7 +26,7 @@ const NewestProduct = async () => {
                     ) : ""
                 )
             })
-        }
+        } */}
     </div>
   )
 }

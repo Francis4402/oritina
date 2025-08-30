@@ -57,3 +57,16 @@ export interface rating {
     createdAt?: string;
     updatedAt?: string;
 }
+
+
+export interface SearchParams {
+    search?: string;
+    category?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    rating?: string;
+    sort?: string;
+    page?: string;
+    view?: string;
+}
+  

@@ -4,7 +4,7 @@ import ProductShow from './ProductShow';
 
 const ProductPage = async () => {
 
-    const cloths = await getProducts();
+    const {data: cloths} = await getProducts();
 
   return (
     <ProductShow cloths={cloths} />
