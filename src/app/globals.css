@@ -6,6 +6,10 @@
   font-family: var(--font-poppins);
 }
 
+Button {
+  cursor: pointer;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

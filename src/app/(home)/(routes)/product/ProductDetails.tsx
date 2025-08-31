@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useCartStore } from '@/lib/store';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -15,6 +16,7 @@ import { FaHeart, FaShare, FaShoppingBag, FaStar, FaRegStar, FaChevronRight } fr
 export const ProductDetails = ({ productData, relatedProducts }: { productData: product, relatedProducts: product[] }) => {
     const [selectedImage, setSelectedImage] = useState(productData.productImage[0]);
     
+    const { addToCart } = useCartStore();
     
     const renderRating = (rating: string = "0") => {
         const numericRating = parseFloat(rating);
@@ -147,7 +149,15 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
                         </div>
 
                         <div className="flex gap-3">
-                            <Button className="flex-1 py-6 text-lg gap-2">
+                            <Button onClick={() => (
+                                addToCart({
+                                    id: productData.id || '',
+                                    name: productData.name,
+                                    price: productData.price,
+                                    productImage: productData.productImage,
+                                    quantity: 1,
+                                })
+                            )} className="flex-1 py-6 text-lg gap-2">
                                 <FaShoppingBag />
                                 Add to Cart
                             </Button>

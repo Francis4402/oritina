@@ -2,19 +2,43 @@ import React from 'react'
 import ShopPage from './ShopPage'
 import { Metadata } from 'next'
 import { getProducts } from '@/services/Product'
+import { product } from '@/app/types/Types'
 
 export const metadata: Metadata = {
   title: 'SHOP',
   description: 'Shop Page'
 }
 
-const Shop = async () => {
+interface ProductResponse {
+  data: product[];
+  pagination: {
+    page: number;
+    Size: number;
+    total: string;
+    totalPages: number;
+  };
+}
 
-  const products = await getProducts();
+const Shop = async ({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) => {
+
+  const params = await searchParams;
+
+  const response: ProductResponse = await getProducts(
+    params.page?.toString() || '1',
+    params.Size?.toString() || '10',
+    {
+      minPrice: params.minPrice,
+      maxPrice: params.maxPrice,
+      producttype: params.producttype,
+      sort: params.sort,
+      totalRating: params.totalRating
+    },
+  );
 
   return (
     <div>
-      <ShopPage products={products} />
+      <ShopPage products={response.data} 
+          pagination={response.pagination} />
     </div>
   )
 }

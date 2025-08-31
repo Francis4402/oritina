@@ -16,15 +16,18 @@ export async function GET(req: Request) {
 
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
+    const producttype = searchParams.get("producttype");
 
-
+    const name = searchParams.get("name");
     const sort = searchParams.get("sort") || "id"; 
     const order = searchParams.get("order") === "desc" ? "desc" : "asc";
+    const totalRating = searchParams.get("totalRating");
 
 
     const sortColumns = {
       id: productsTable.id,
       price: productsTable.price,
+      name: productsTable.name,
       totalRating: productsTable.totalRating,
       createdAt: productsTable.createdAt,
     } as const;
@@ -36,6 +39,10 @@ export async function GET(req: Request) {
     let conditions = [];
     if (minPrice) conditions.push(gte(productsTable.price, Number(minPrice)));
     if (maxPrice) conditions.push(lte(productsTable.price, Number(maxPrice)));
+    if (producttype) conditions.push(eq(productsTable.producttype, producttype));
+    if (name) conditions.push(eq(productsTable.name, name));
+    if (totalRating) conditions.push(eq(productsTable.totalRating, totalRating));
+
 
     // Query
     const products = await db

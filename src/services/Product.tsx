@@ -7,9 +7,24 @@ import { revalidateTag } from "next/cache";
 
 const baseurl = process.env.BASE_URL;
 
-export const getProducts = async () => {
+export const getProducts = async (page?: string, Size?: string, query?: { [key: string]: string | string[] | undefined }) => {
+    const params = new URLSearchParams();
+
+    if (page) params.append('page', page);
+    if (Size) params.append('Size', Size);
+
+    const queryParams = [
+        'minPrice', 'maxPrice', 'producttype', 'sort', 'totalRating', 'name'
+    ];
+
+    queryParams.forEach(param => {
+        if (query?.[param]) {
+          params.append(param, query[param]!.toString());
+        }
+    });
+    
     try {
-        const res = await fetch(`${baseurl}/products`, {
+        const res = await fetch(`${baseurl}/products?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -20,7 +35,15 @@ export const getProducts = async () => {
             }
         });
 
-        return res.json();
+        const data = await res.json();
+
+        return {
+            ...data,
+            pagination: {
+              ...data.pagination,
+              total: Number(data.pagination.total)
+            }
+        }
     } catch (error) {
         console.log(error);
     }

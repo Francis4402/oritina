@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useCartStore } from '@/lib/store';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -17,6 +18,8 @@ const Navbar = () => {
 
   const {data: session} = useSession();
 
+  const { getTotalItems } = useCartStore();
+  
 
   const navLinks = [
     {
@@ -39,16 +42,12 @@ const Navbar = () => {
 
   const router = useRouter();
 
-  const handleRouteSignIn = () => {
-    router.push("/login");
-  }
-
   return (
     <div className="sticky top-0 z-50 bg-white dark:bg-[#0D1117] shadow-md">
-      {/* Top section with search, logo, and icons */}
+      
       <div className='bg-[#0D1117] w-full items-center justify-center py-4 md:py-6'>
         <div className='flex justify-between items-center container mx-auto px-4'>
-          {/* Mobile menu button - visible only on small screens */}
+          
           <button 
             className="md:hidden text-white p-2"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -56,7 +55,7 @@ const Navbar = () => {
             {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </button>
 
-          {/* Search input - hidden on mobile, visible on medium screens and up */}
+          
           <div className="hidden md:flex relative">
             <Input 
               type='text' 
@@ -68,12 +67,12 @@ const Navbar = () => {
             <FaSearch className="absolute right-3 top-3 text-gray-400" />
           </div>
 
-          {/* Logo - centered on all screens */}
+
           <h1 className='poppins scroll-m-20 text-white text-center text-2xl md:text-4xl font-extrabold tracking-tight'>ORIANA</h1>
           
           {/* Right side icons */}
           <div className='flex items-center gap-4'>
-            {/* Mobile search icon - visible only on small screens */}
+            
             <button className="md:hidden text-white">
               <FaSearch size={20} />
             </button>
@@ -83,9 +82,16 @@ const Navbar = () => {
               <p className="hidden lg:block">WishList</p>
             </Link>
 
-            <Link href={"/"} className='hidden md:flex items-center gap-2 text-white'>
-              <FaShoppingBag />
-              <p className="hidden lg:block">Cart</p>
+            <Link href={"/cart"} className="hidden md:flex items-center gap-2 text-white hover:text-gray-200 transition-colors">
+              <div className="relative">
+                <FaShoppingBag className="w-5 h-5" />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </div>
+              <p className="hidden lg:block text-sm font-medium">Cart</p>
             </Link>
             
             <div className="hidden md:block">
@@ -128,7 +134,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile search input - appears when search icon is clicked */}
+        
         <div className="md:hidden container mx-auto px-4 mt-3">
           <div className="relative">
             <Input 
@@ -143,7 +149,7 @@ const Navbar = () => {
         </div>
       </div>
     
-      {/* Desktop navigation - hidden on mobile */}
+      
       <div className='hidden md:flex items-center justify-center gap-10 py-4 bg-white dark:bg-[#0D1117]'>
         {navLinks.map((link) => (
           <Link href={link.href} key={link.label}>
@@ -167,7 +173,7 @@ const Navbar = () => {
               </Link>
             ))}
             
-            {/* Mobile-only wishlist and cart links */}
+            
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col space-y-3">
               <Link 
                 href={"/"} 
@@ -179,7 +185,7 @@ const Navbar = () => {
               </Link>
 
               <Link 
-                href={"/"} 
+                href={"/cart"} 
                 className='flex items-center gap-2 text-gray-800 dark:text-white'
                 onClick={() => setIsMobileMenuOpen(false)}
               >
