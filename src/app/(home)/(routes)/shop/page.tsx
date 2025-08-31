@@ -19,9 +19,9 @@ interface ProductResponse {
   };
 }
 
-const Shop = async ({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) => {
+const Shop = async (props: { searchParams: Promise<Record<string, string | string[] | undefined>> }) => {
 
-  const params = await searchParams;
+  const params = await props.searchParams;
 
   const response: ProductResponse = await getProducts(
     params.page?.toString() || '1',

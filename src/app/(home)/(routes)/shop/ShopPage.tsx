@@ -88,10 +88,8 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
     const totalPages = pagination.totalPages
     const pages = []
 
-    // Show fewer pages on mobile for better UX
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
 
-    // Always show first page
     if (totalPages > 0) {
       pages.push(
         <PaginationItem key={1}>
