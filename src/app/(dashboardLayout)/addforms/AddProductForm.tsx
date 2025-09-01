@@ -18,10 +18,14 @@ import React, { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+
 const AddProductForm = () => {
   const [open, setOpen] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [category, setCategory] = useState<category[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+
+  const sizeOptions = ["M", "L", "XL", "2XL"];
 
   useEffect(() => {
     getProductCategory().then(res => {
@@ -38,7 +42,9 @@ const AddProductForm = () => {
       producttype: '',
       color: [''],
       price: 0,
+      size: [],
       category: '',
+      spcefication: [''],
     }
   });
 
@@ -56,6 +62,8 @@ const AddProductForm = () => {
         price: data.price,
         productImage: imageUrls,
         category: data.category,
+        size: selectedSizes,
+        spcefication: data.spcefication.filter(spec => spec.trim() !== ''),
         producttype: data.producttype,
         color: data.color.filter(color => color.trim() !== ''),
         totalRating: "0",
@@ -68,14 +76,8 @@ const AddProductForm = () => {
         toast.success("Product Added Successfully");
         setOpen(false);
         setImageUrls([]);
-        form.reset({
-          name: '',
-          productImage: [],
-          description: '',
-          color: [''],
-          price: 0,
-          category: '',
-        });
+        setSelectedSizes([]);
+        form.reset();
       } else {
         toast.error(res.error);
       }
@@ -89,6 +91,20 @@ const AddProductForm = () => {
     newImageUrls.splice(index, 1);
     setImageUrls(newImageUrls);
   };
+
+  const handleSizeToggle = (size: string) => {
+    setSelectedSizes(prev => {
+      if (prev.includes(size)) {
+        return prev.filter(s => s !== size);
+      } else {
+        return [...prev, size];
+      }
+    });
+  };
+
+  useEffect(() => {
+    form.setValue('size', selectedSizes as ("M" | "L" | "XL" | "2XL")[]);
+  }, [selectedSizes, form]);
 
 
   return (
@@ -202,6 +218,26 @@ const AddProductForm = () => {
               </FormItem>
             )} />
 
+            <FormField control={form.control} name='size' render={() => (
+              <FormItem>
+                <FormLabel>Product Size</FormLabel>
+                <div className="flex flex-wrap gap-2">
+                  {sizeOptions.map((size) => (
+                    <Button
+                      key={size}
+                      type="button"
+                      variant={selectedSizes.includes(size) ? "default" : "outline"}
+                      onClick={() => handleSizeToggle(size)}
+                      className="rounded-md"
+                    >
+                      {size}
+                    </Button>
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )} />
+
             <FormField control={form.control} name="category" render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
@@ -219,6 +255,44 @@ const AddProductForm = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            {/*Dynamic Spcefication */}
+            <FormField control={form.control} name="spcefication" render={({field}) => (
+              <FormItem>
+                <FormLabel>Detailed Specification</FormLabel>
+                <div className='space-y-3'>
+                  {field.value.map((spec, index) => (
+                    <div key={index} className='flex items-center gap-2'>
+                      <FormControl>
+                        <Input value={spec} onChange={(e) => {
+                          const newSpec = [...field.value];
+                          newSpec[index] = e.target.value;
+                          field.onChange(newSpec);
+                        }} placeholder='Enter Specefication' className='flex-1' />
+                      </FormControl>
+                      {field.value.length > 1 && (
+                        <Button type='button' variant={'destructive'} size={'icon'} onClick={() => {
+                          const newSpec = field.value.filter((_, i) => i !== index);
+                          field.onChange(newSpec);
+                        }}>
+                          <X size={16} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => field.onChange([...field.value, ''])}
+                      className="mt-2"
+                    >
+                      <Plus size={16} className="mr-2" />
+                      Add Spec
+                  </Button>
+                </div>
                 <FormMessage />
               </FormItem>
             )} />

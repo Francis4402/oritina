@@ -25,17 +25,57 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { useCartStore } from '@/lib/store'
+import { toast } from 'sonner'
 
 const ShopPage = ({ products, pagination }: { products: product[], pagination: IMeta }) => {
+  
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  
   const router = useRouter()
   const searchParams = useSearchParams()
 
+
   const { addToCart } = useCartStore();
+
+  const handleAddToCart = (product: product) => {
+
+    if (product.size && product.size.length > 0 && !selectedSize) {
+      toast.error("Please select a size first");
+      return;
+    }
+    
+    if (product.color && product.color.length > 0 && !selectedColor) {
+        toast.error("Please select a color first");
+        return;
+    }
+
+    try {
+      addToCart({
+        id: product.id || '',
+        name: product.name,
+        price: product.price,
+        productImage: product.productImage,
+        category: product.category,
+        totalRating: product.totalRating,
+        quantity: 1,
+        selectedColor: selectedColor || undefined,
+        selectedSize: selectedSize || undefined,
+        availableColors: product.color,
+        availableSizes: product.size
+      })
+
+      toast.success("Product Added Successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const [priceRange, setPriceRange] = useState<number[]>([
     Number(searchParams.get("minPrice")) || 0,
     Number(searchParams.get("maxPrice")) || 200
   ])
+
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("producttype") || 'all')
   const [sortOption, setSortOption] = useState(searchParams.get("sort") || 'id')
 
@@ -331,10 +371,11 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
             {products.map((product) => (
               <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <CardContent>
-                  <Link href={`/product/${product.id}`}>
-                    <div className={`relative ${viewMode === 'list' ? 'flex' : ''}`}>
+                <div className={`relative ${viewMode === 'list' ? 'flex' : ''}`}>
                       <div className={`bg-blue-100`}>
-                        <Image src={product.productImage[0]} alt="T-shirt" width={500} height={500} />
+                        <Link href={`/product/${product.id}`}>
+                          <Image src={product.productImage[0]} alt="T-shirt" width={500} height={500} />
+                        </Link>
 
                         {/* Badges */}
                         <div className="absolute top-2 left-2">
@@ -352,26 +393,42 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
 
                       <div className={`p-4 ${viewMode === 'list' ? 'w-2/3' : ''}`}>
                         <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                        {renderRating(product.totalRating)}
+                        
+                        <div className='flex items-center gap-2'>
+                          <div>
+                            {renderRating(product.totalRating)}
+                          </div>
+                          <div className='flex items-center gap-1'>
+                            {product.color.map((color, index) => (
+                                <div 
+                                    key={index}
+                                    className={`w-5 h-5 rounded-full border cursor-pointer ${selectedColor === color ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                                    style={{ backgroundColor: color }}
+                                    title={color}
+                                    onClick={() => setSelectedColor(color)}
+                                />
+                              ))}
+                          </div>
+                        </div>
+                        
                         <p className="text-gray-600 text-sm items-center mt-1">{product.reviews} reviews</p>
+                        
+                        <div className='flex gap-1 flex-wrap mt-2'>
+                          {
+                            product.size.map((s, index) => (
+                              <Button key={index} variant={selectedSize === s ? "default" : "outline"} size={"sm"} onClick={(e) => { e.preventDefault(), e.stopPropagation(), setSelectedSize(s)}}>
+                                {s}
+                              </Button>
+                            ))
+                          }
+                        </div>
+
                         <div className="flex items-center justify-between mt-3">
                           <span className="font-bold text-lg">${product.price}</span>
-                          <Button onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            addToCart({
-                              id: product.id || '',
-                              name: product.name,
-                              price: product.price,
-                              productImage: product.productImage,
-                              quantity: 1,
-                            })
-                          }} size="sm">Add to Cart</Button>
+                          <Button onClick={(e) => handleAddToCart(product)} size="sm">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
-                  </Link>
                 </CardContent>
               </Card>
             ))}

@@ -4,9 +4,8 @@ import { Input } from '@/components/ui/input'
 import { FaHeart, FaShoppingBag, FaSearch, FaBars, FaTimes } from "react-icons/fa";
 import Link from 'next/link'
 import { ModeToggle } from '../../utils/ModeToggle';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,11 +14,10 @@ import { useCartStore } from '@/lib/store';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
 
   const {data: session} = useSession();
-
   const { getTotalItems } = useCartStore();
-  
 
   const navLinks = [
     {
@@ -40,7 +38,13 @@ const Navbar = () => {
     }
   ];
 
-  const router = useRouter();
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  
+  const cartItemCount = isMounted ? getTotalItems() : 0;
 
   return (
     <div className="sticky top-0 z-50 bg-white dark:bg-[#0D1117] shadow-md">
@@ -77,7 +81,7 @@ const Navbar = () => {
               <FaSearch size={20} />
             </button>
 
-            <Link href={"/"} className='hidden md:flex items-center gap-2 text-white'>
+            <Link href={"/wishlist"} className='hidden md:flex items-center gap-2 text-white'>
               <FaHeart />
               <p className="hidden lg:block">WishList</p>
             </Link>
@@ -85,10 +89,10 @@ const Navbar = () => {
             <Link href={"/cart"} className="hidden md:flex items-center gap-2 text-white hover:text-gray-200 transition-colors">
               <div className="relative">
                 <FaShoppingBag className="w-5 h-5" />
-                {getTotalItems() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
-                    {getTotalItems()}
-                  </span>
+                {isMounted && (
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
+                    {cartItemCount}
+                  </div>
                 )}
               </div>
               <p className="hidden lg:block text-sm font-medium">Cart</p>
@@ -176,7 +180,7 @@ const Navbar = () => {
             
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col space-y-3">
               <Link 
-                href={"/"} 
+                href={"/wishlist"} 
                 className='flex items-center gap-2 text-gray-800 dark:text-white'
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -189,7 +193,14 @@ const Navbar = () => {
                 className='flex items-center gap-2 text-gray-800 dark:text-white'
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <FaShoppingBag />
+                <div className="relative">
+                  <FaShoppingBag />
+                  {isMounted && (
+                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
+                      {cartItemCount}
+                    </div>
+                  )}
+                </div>
                 <p>Cart</p>
               </Link>
               

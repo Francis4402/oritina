@@ -9,6 +9,8 @@ export interface product {
     category: string;
     producttype: string;
     color: string[];
+    size: string[];
+    spcefication: string[];
     totalRating?: string;
     reviews?: string;
     createdAt?: string;

@@ -1,6 +1,5 @@
 'use client';
 
-
 import { product } from '@/app/types/Types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,11 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCartStore } from '@/lib/store';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FaHeart, FaShare, FaShoppingBag, FaStar, FaRegStar, FaChevronRight } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 export const ProductDetails = ({ productData, relatedProducts }: { productData: product, relatedProducts: product[] }) => {
     const [selectedImage, setSelectedImage] = useState(productData.productImage[0]);
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState<string | null>(null);
+    const [quantity, setQuantity] = useState(1);
     
     const { addToCart } = useCartStore();
     
@@ -30,6 +33,44 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
         }
         return stars;
     };
+
+    const handleAddToCart = () => {
+        if (productData.size && productData.size.length > 0 && !selectedSize) {
+            toast.error("Please select a size first");
+            return;
+        }
+        
+        if (productData.color && productData.color.length > 0 && !selectedColor) {
+            toast.error("Please select a color first");
+            return;
+        }
+        
+        addToCart({
+            id: productData.id || '',
+            name: productData.name,
+            price: productData.price,
+            productImage: productData.productImage,
+            category: productData.category,
+            totalRating: productData.totalRating,
+            quantity: quantity,
+            selectedColor: selectedColor || undefined,
+            selectedSize: selectedSize || undefined,
+            availableColors: productData.color,
+            availableSizes: productData.size
+        });
+
+        toast.success("Product added to cart!");
+    };
+
+    // Size chart data
+    const sizeChart = [
+        { size: 'XS', chest: 36, length: 26, sleeve: 7.5 },
+        { size: 'S', chest: 37, length: 26, sleeve: 7.75 },
+        { size: 'M', chest: 39, length: 27.5, sleeve: 8.5 },
+        { size: 'L', chest: 40.5, length: 28, sleeve: 8.75 },
+        { size: 'XL', chest: 43, length: 29, sleeve: 9 },
+        { size: '2XL', chest: 45, length: 30, sleeve: 9.25 },
+    ];
 
     // Sample reviews data
     const reviews = [
@@ -123,11 +164,66 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
                                 {productData.color.map((color, index) => (
                                     <div 
                                         key={index}
-                                        className="w-8 h-8 rounded-full border cursor-pointer"
+                                        className={`w-8 h-8 rounded-full border cursor-pointer ${selectedColor === color ? 'ring-2 ring-primary ring-offset-2' : ''}`}
                                         style={{ backgroundColor: color }}
                                         title={color}
+                                        onClick={() => setSelectedColor(color)}
                                     />
                                 ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <Separator />
+
+                    {/* Size Options */}
+                    {productData.size && productData.size.length > 0 && (
+                        <div>
+                            <h3 className="text-lg font-semibold mb-2">Size</h3>
+                            <div className='flex gap-2 flex-wrap'>
+                                {productData.size.map((s, index) => (
+                                    <Button 
+                                        key={index} 
+                                        variant={selectedSize === s ? "default" : "outline"}
+                                        onClick={() => setSelectedSize(s)}
+                                    >
+                                        {s}
+                                    </Button>
+                                ))}
+                            </div>
+                            
+                            {/* Size Chart */}
+                            <div className="mt-6">
+                                <h3 className="text-lg font-semibold mb-3">Size Chart (in inches)</h3>
+                                <div className="grid grid-cols-5 gap-2 p-4 border rounded-md bg-muted/30">
+                                    {/* Header row */}
+                                    <div className="font-semibold text-center">Size</div>
+                                    <div className="font-semibold text-center">Chest (Round)</div>
+                                    <div className="font-semibold text-center">Length</div>
+                                    <div className="font-semibold text-center">Sleeve</div>
+                                    <div className="font-semibold text-center">Select</div>
+                                    
+                                    {/* Size rows */}
+                                    {sizeChart.map((item, index) => (
+                                        <React.Fragment key={index}>
+                                            <div className="text-center font-medium">{item.size}</div>
+                                            <div className="text-center">{item.chest}</div>
+                                            <div className="text-center">{item.length}</div>
+                                            <div className="text-center">{item.sleeve}</div>
+                                            <div className="text-center">
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    variant={selectedSize === item.size ? "default" : "outline"}
+                                                    onClick={() => setSelectedSize(item.size)}
+                                                    disabled={!productData.size.includes(item.size)}
+                                                >
+                                                    {selectedSize === item.size ? "Selected" : "Select"}
+                                                </Button>
+                                            </div>
+                                        </React.Fragment>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -141,23 +237,19 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
                                 <span className="font-medium">Quantity:</span>
                                 <Input 
                                     type="number" 
-                                    defaultValue="1" 
+                                    value={quantity}
                                     min="1"
                                     className="w-20" 
+                                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                                 />
                             </div>
                         </div>
 
                         <div className="flex gap-3">
-                            <Button onClick={() => (
-                                addToCart({
-                                    id: productData.id || '',
-                                    name: productData.name,
-                                    price: productData.price,
-                                    productImage: productData.productImage,
-                                    quantity: 1,
-                                })
-                            )} className="flex-1 py-6 text-lg gap-2">
+                            <Button 
+                                onClick={handleAddToCart}
+                                className="flex-1 py-6 text-lg gap-2"
+                            >
                                 <FaShoppingBag />
                                 Add to Cart
                             </Button>
@@ -171,9 +263,22 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
                             </Button>
                         </div>
                     </div>
+                        
+                    <Separator />
+
+                    <div>
+                        <h3 className="font-semibold mb-2">Detailed Specification</h3>
+                        <div className="grid gap-2 text-sm">
+                            {productData.spcefication.map((d, index) => (
+                                <li key={index}>
+                                    {d}
+                                </li>
+                            ))}
+                        </div>
+                    </div>
 
                     {/* Product Details */}
-                    <div className="pt-4 border-t">
+                    <div>
                         <h3 className="font-semibold mb-2">Product Details</h3>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                             <div className="text-muted-foreground">Category:</div>
@@ -336,4 +441,4 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
             )}
         </div>
     );
-}
+};

@@ -1,5 +1,5 @@
 
-import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer } from "drizzle-orm/pg-core";
+import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer, boolean } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum('user_role', ['User', 'Admin']);
 
@@ -21,10 +21,14 @@ export const productsTable = pgTable("products", {
   price: integer("price").notNull(),
   productImage: text("product_image").array().notNull(),
   color: varchar({ length: 255 }).array().notNull(),
+  spcefication: varchar({ length: 255 }).array().notNull(),
   category: varchar({ length: 255 }).notNull(),
   producttype: varchar({ length: 255 }).notNull(),
   totalRating: varchar({ length: 255 }),
   reviews: varchar({ length: 255 }),
+  size: varchar({ length: 255 }).array().notNull(),
+  isFavorite: boolean("is_favorite").notNull().default(false),
+  isAvailable: boolean("is_available").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
