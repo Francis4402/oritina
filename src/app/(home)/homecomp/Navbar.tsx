@@ -86,17 +86,21 @@ const Navbar = () => {
               <p className="hidden lg:block">WishList</p>
             </Link>
 
-            <Link href={"/cart"} className="hidden md:flex items-center gap-2 text-white hover:text-gray-200 transition-colors">
-              <div className="relative">
-                <FaShoppingBag className="w-5 h-5" />
-                {isMounted && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
-                    {cartItemCount}
+            {
+              session && (
+                <Link href={"/cart"} className="hidden md:flex items-center gap-2 text-white hover:text-gray-200 transition-colors">
+                  <div className="relative">
+                    <FaShoppingBag className="w-5 h-5" />
+                    {isMounted && (
+                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
+                        {cartItemCount}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <p className="hidden lg:block text-sm font-medium">Cart</p>
-            </Link>
+                  <p className="hidden lg:block text-sm font-medium">Cart</p>
+                </Link>
+              )
+            }
             
             <div className="hidden md:block">
               <ModeToggle />
@@ -188,21 +192,9 @@ const Navbar = () => {
                 <p>WishList</p>
               </Link>
 
-              <Link 
-                href={"/cart"} 
-                className='flex items-center gap-2 text-gray-800 dark:text-white'
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <div className="relative">
-                  <FaShoppingBag />
-                  {isMounted && (
-                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
-                      {cartItemCount}
-                    </div>
-                  )}
-                </div>
-                <p>Cart</p>
-              </Link>
+              {
+
+              }
               
               <div className="pt-2">
                 <ModeToggle />
