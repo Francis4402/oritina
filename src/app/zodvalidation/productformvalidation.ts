@@ -28,6 +28,8 @@ export const productValidationSchema = z.object({
 
     price: z.number(),
 
+    quantity: z.number(),
+
     size: z.array(z.enum(["M", "L", "XL", "2XL"])),
 
     category: z.string().min(3).max(255, {

@@ -100,6 +100,7 @@ export async function POST(req: NextRequest) {
             spcefication: body.spcefication,
             color: body.color,
             totalRating: body.totalRating || "0",
+            quantity: body.quantity,
             reviews: body.reviews || "0",
             createdAt: new Date(),
             updatedAt: new Date()

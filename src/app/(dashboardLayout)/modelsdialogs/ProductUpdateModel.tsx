@@ -17,29 +17,35 @@ import React, { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-
 const UpdateProductModel = ({product}: {product: product}) => {
   const [open, setOpen] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [category, setCategory] = useState([]);
+
+  const sizeOptions = ["M", "L", "XL", "2XL"];
 
   useEffect(() => {
     getProductCategory().then(res => {
       setCategory(res);
     });
-  },[]);
 
+    form.setValue('size', selectedSizes as ("M" | "L" | "XL" | "2XL")[]);
+  }, [selectedSizes]);
 
+  // Initialize form with proper default values including spcefication and color
   const form = useForm({
     resolver: zodResolver(productValidationSchema),
     defaultValues: {
-      name: product.name,
-      productImage: product.productImage,
-      description: product.description,
-      price: product.price,
-      color: product.color,
-      category: product.category,
+      name: product.name || "",
+      productImage: product.productImage || [],
+      description: product.description || "",
+      price: product.price || 0,
+      color: product.color || [""],
+      category: product.category || "",
+      producttype: product.producttype || "",
+      quantity: product.quantity || 0,
+      spcefication: product.spcefication || [""]
     }
   });
   
@@ -47,25 +53,29 @@ const UpdateProductModel = ({product}: {product: product}) => {
 
   const onSubmit: SubmitHandler<ProductValidation> = async (data) => {
     try {
-      if (imageUrls) {
+      if (imageUrls.length > 0) {
         data.productImage = imageUrls;
       }
 
       const res = await updateProduct({
         id: product.id,
-        ...data
+        ...data,
+        spcefication: data.spcefication.filter(spec => spec.trim() !== ''),
+        color: data.color.filter(color => color.trim() !== ''),
       });
 
       if (res) {
-        toast.success("Product Added");
+        toast.success("Product Updated");
         setOpen(false);
         setImageUrls([]);
+        setSelectedSizes([]);
         form.reset();
       } else {
         toast.error(res.error);
       }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to update product");
     }
   }
 
@@ -75,113 +85,283 @@ const UpdateProductModel = ({product}: {product: product}) => {
     setImageUrls(newImageUrls);
   };
 
+  const handleSizeToggle = (size: string) => {
+    setSelectedSizes(prev => {
+      if (prev.includes(size)) {
+        return prev.filter(s => s !== size);
+      } else {
+        return [...prev, size];
+      }
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
             <Button variant={"default"} size={"sm"}><Plus />Update Product</Button>
         </DialogTrigger>
-        <DialogContent>
-          <DialogHeader className='flex items-center'>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
             <DialogTitle>Update Product</DialogTitle>
           </DialogHeader>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-5'>
-                  <div className="flex flex-col gap-4 items-center justify-center p-4 bg-muted/30 rounded-lg">
+              <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-5 overflow-hidden'>
+                <div className="overflow-y-auto pr-2 max-h-[calc(90vh-100px)]">
+                  <div className="flex flex-col gap-5 pb-4">
+                    
+                    <div className="flex flex-col gap-4 items-center justify-center p-4 bg-muted/30 rounded-lg">
+                      {imageUrls.length > 0 ? (
+                        <div className="grid grid-cols-3 gap-2 w-full">
+                          {imageUrls.map((url, index) => (
+                            <div key={index} className="relative w-full h-32 overflow-hidden border-2 border-primary rounded-md group">
+                              <img
+                                src={url}
+                                alt={`Product preview ${index + 1}`}
+                                className="object-cover w-full h-full"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="relative w-32 h-32 bg-muted flex items-center justify-center rounded-md border">
+                          <span className="text-muted-foreground">No images</span>
+                        </div>
+                      )}
 
-                    {imageUrls.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-2 w-full">
-                        {imageUrls.map((url, index) => (
-                          <div key={index} className="relative w-full h-32 overflow-hidden border-2 border-primary rounded-md group">
-                            <img
-                              src={url}
-                              alt={`Product preview ${index + 1}`}
-                              className="object-cover w-full h-full"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="relative w-32 h-32 bg-muted flex items-center justify-center rounded-md border">
-                        <span className="text-muted-foreground">No images</span>
-                      </div>
-                    )}
+                      <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                          if (res && res.length > 0) {
+                            const newUrls = res.map(file => file.url);
+                            setImageUrls(prev => [...prev, ...newUrls]);
+                            toast.success(`${res.length} image(s) uploaded`);
+                          }
+                        }}
+                        onUploadError={(error: Error) => {
+                          toast.error(`Upload failed: ${error.message}`);
+                        }}
+                        appearance={{
+                          button: "ut-ready:bg-blue-500 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md",
+                        }}
+                      />
+                    </div>
 
-                    <UploadButton
-                      endpoint="imageUploader"
-                      onClientUploadComplete={(res) => {
-                        if (res && res.length > 0) {
-                          const newUrls = res.map(file => file.url);
-                          setImageUrls(prev => [...prev, ...newUrls]);
-                          toast.success(`${res.length} image(s) uploaded`);
-                        }
-                      }}
-                      onUploadError={(error: Error) => {
-                        toast.error(`Upload failed: ${error.message}`);
-                      }}
-                      appearance={{
-                        button: "ut-ready:bg-blue-500 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md",
-                      }}
-                    />
-                  </div>
-                    <FormField control={form.control} name="name" render={({field}) => (
+                    <FormField control={form.control} name="name" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Product Name</FormLabel>
-                        <Input {...field} value={field.value || ""} placeholder='Enter Product Name' />
-                        <FormMessage /> 
-                      </FormItem>
-                    )} />
-
-                    <FormField control={form.control} name="description" render={({field}) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <Textarea {...field} value={field.value || ""} placeholder='Enter Description' />
+                        <FormControl>
+                          <Input {...field} value={field.value || ""} placeholder='Enter Product Name' />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
 
-                    <FormField control={form.control} name="price" render={({field}) => (
+                    <FormField control={form.control} name="description" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} value={field.value || ""} placeholder='Enter Description' />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <FormField control={form.control} name="price" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Price</FormLabel>
-                        <Input {...field} value={field.value || ""} onChange={(e) => field.onChange(Number(e.target.value) || 0)} placeholder='Enter Price' />
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="number"
+                            value={field.value || ""} 
+                            onChange={(e) => field.onChange(Number(e.target.value) || 0)} 
+                            placeholder='Enter Price' 
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
 
                     <FormField control={form.control} name="category" render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Category" />
+                              </SelectTrigger>
+                            </FormControl>
+
+                            <SelectContent>
+                              {
+                                category.map((item: category) => (
+                                  <SelectItem key={item?.id} value={item?.category}>
+                                    {item?.category}
+                                  </SelectItem>
+                                ))
+                              }
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+
+                    <FormField control={form.control} name='producttype' render={({field}) => (
                       <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>Product Type</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
+                          <FormControl className='w-full'>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select Category" />
+                              <SelectValue placeholder="Select Product Type" />
                             </SelectTrigger>
                           </FormControl>
 
                           <SelectContent>
-                            {
-                              category.map((item: category) => (
-                                <SelectItem key={item?.id} value={item?.category}>
-                                  {item?.category}
-                                </SelectItem>
-                              ))
-                            }
+                            <SelectItem value="newarrivals">New Arrivals</SelectItem>
+                            <SelectItem value="bestsellers">Best Sellers</SelectItem>
+                            <SelectItem value="featured">Featured</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )} />
 
-                    <Button type="submit" disabled={isSubmitting}>
-                        Submit
+                    <div className='flex justify-between items-center gap-4'>
+                      <FormField control={form.control} name='size' render={() => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Product Size</FormLabel>
+                          <div className="flex flex-wrap gap-2">
+                            {sizeOptions.map((size) => (
+                              <Button
+                                key={size}
+                                type="button"
+                                variant={selectedSizes.includes(size) ? "default" : "outline"}
+                                onClick={() => handleSizeToggle(size)}
+                                className="rounded-md h-8 px-3"
+                              >
+                                {size}
+                              </Button>
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      
+                      <FormField control={form.control} name="quantity" render={({field}) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Quantity</FormLabel>
+                          <FormControl>
+                            <Input {...field} type='number' value={field.value || ""} onChange={(e) => field.onChange(Number(e.target.value) || 0)} placeholder='Enter Quantity' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    {/*Dynamic Spcefication */}
+                    <FormField control={form.control} name="spcefication" render={({field}) => (
+                      <FormItem>
+                        <FormLabel>Detailed Specification</FormLabel>
+                        <div className='space-y-3'>
+                          {field.value?.map((spec, index) => (
+                            <div key={index} className='flex items-center gap-2'>
+                              <FormControl>
+                                <Input value={spec} onChange={(e) => {
+                                  const newSpec = [...field.value];
+                                  newSpec[index] = e.target.value;
+                                  field.onChange(newSpec);
+                                }} placeholder='Enter Specefication' className='flex-1' />
+                              </FormControl>
+                              {field.value.length > 1 && (
+                                <Button type='button' variant={'destructive'} size={'icon'} onClick={() => {
+                                  const newSpec = field.value.filter((_, i) => i !== index);
+                                  field.onChange(newSpec);
+                                }}>
+                                  <X size={16} />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => field.onChange([...field.value, ''])}
+                              className="mt-2"
+                            >
+                              <Plus size={16} className="mr-2" />
+                              Add Spec
+                          </Button>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    {/* Dynamic Color Inputs */}
+                    <FormField
+                      control={form.control}
+                      name="color"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Colors</FormLabel>
+                          <div className="space-y-3">
+                            {field.value?.map((color, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <FormControl>
+                                  <Input
+                                    value={color}
+                                    onChange={(e) => {
+                                      const newColors = [...field.value];
+                                      newColors[index] = e.target.value;
+                                      field.onChange(newColors);
+                                    }}
+                                    placeholder={`Color ${index + 1}`}
+                                    className="flex-1"
+                                  />
+                                </FormControl>
+                                {field.value.length > 1 && (
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => {
+                                      const newColors = field.value.filter((_, i) => i !== index);
+                                      field.onChange(newColors);
+                                    }}
+                                    className="h-10 w-10"
+                                  >
+                                    <X size={16} />
+                                  </Button>
+                                )}
+                              </div>
+                            ))}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => field.onChange([...field.value, ''])}
+                              className="mt-2"
+                            >
+                              <Plus size={16} className="mr-2" />
+                              Add Color
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button type="submit" disabled={isSubmitting} className="mt-4">
+                      Update Product
                     </Button>
-                </form>
+                  </div>
+                </div>
+              </form>
             </Form>
         </DialogContent>
     </Dialog>

@@ -49,7 +49,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange>
               <Provider session={session}>
-                <Toaster position="top-right" />
+                <Toaster position="top-right" duration={1500} />
                 {children}
               </Provider>
         </ThemeProvider>

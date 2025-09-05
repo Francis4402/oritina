@@ -69,6 +69,11 @@ const ProductTable = ({product}: {product: product[]}) => {
             cell: ({row}) => <div className="text-left">${row.getValue('price')}</div>
         },
         {
+            accessorKey: 'quantity',
+            header: 'Quantity',
+            cell: ({row}) => <div className="text-left">{row.getValue('quantity')}</div>
+        },
+        {
             accessorKey: 'category',
             header: 'Category',
             cell: ({row}) => <div className="text-left">{row.getValue('category')}</div>
@@ -86,7 +91,7 @@ const ProductTable = ({product}: {product: product[]}) => {
         {
             accessorKey: 'producttype',
             header: 'Product Type',
-            cell: ({row}) => <div className="text-left">{row.getValue('producttype')}</div>
+            cell: ({row}) => <div className="text-left"><Badge>{row.getValue('producttype')}</Badge></div>
         },
         {
             accessorKey: 'color',

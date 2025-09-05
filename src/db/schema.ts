@@ -9,6 +9,7 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 255 }),
   image: varchar("image", { length: 255 }),
+  address: varchar({ length: 1000 }).notNull(),
   role: userRoleEnum('role').notNull().default('User'),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -26,9 +27,9 @@ export const productsTable = pgTable("products", {
   producttype: varchar({ length: 255 }).notNull(),
   totalRating: varchar({ length: 255 }),
   reviews: varchar({ length: 255 }),
+  quantity: integer("quantity").notNull(),
   size: varchar({ length: 255 }).array().notNull(),
   isFavorite: boolean("is_favorite").notNull().default(false),
-  isAvailable: boolean("is_available").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -75,3 +76,4 @@ export const ratingTable = pgTable("rating", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 })
+

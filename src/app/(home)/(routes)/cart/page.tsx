@@ -14,15 +14,14 @@ import {
   Shield,
   Heart,
   Star,
-  CreditCard
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/store'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { useState } from 'react'
-import {loadStripe} from '@stripe/stripe-js';
+import BuyButton from '@/components/ui/buyButton'
+
 
 
 
@@ -36,6 +35,7 @@ const CartPage = () => {
     clearCart
   } = useCartStore()
 
+
   const subtotal = getTotalPrice()
   const totalItems = getTotalItems()
   const tax = subtotal * 0.08
@@ -45,7 +45,6 @@ const CartPage = () => {
   const freeShippingProgress = Math.min(100, (subtotal / 75) * 100)
   const amountToFreeShipping = Math.max(0, 75 - subtotal)
 
-  const [isLoading, setIsLoading] = useState(false)
 
 
   const renderStars = (rating: number) => {
@@ -55,65 +54,6 @@ const CartPage = () => {
         className={`h-3 w-3 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
       />
     ))
-  }
-
-  const makePayment = async () => {
-    setIsLoading(true)
-    
-    try {
-      // Format products for the API
-      const products = cart.map(item => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        image: item.productImage[0],
-        quantity: item.quantity,
-        selectedColor: item.selectedColor,
-        selectedSize: item.selectedSize
-      }))
-
-      const body = {
-        products: products
-      }
-
-      const headers = {
-        'Content-Type': 'application/json',
-      }
-
-      
-      const res = await fetch(`${process.env.BASE_URL}/create-payment-intent`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(body)
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to create payment session');
-      }
-
-      const session = await res.json();
-
-      const stripe = await loadStripe(process.env.PUBLISHABLE_KEY as string);
-
-      if (!stripe) {
-        throw new Error('Stripe failed to load');
-      }
-
-      // Redirect to Stripe Checkout
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.id
-      });
-
-      if (result.error) {
-        toast.error(result.error.message || 'Failed to redirect to checkout');
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to process payment');
-    } finally {
-      setIsLoading(false);
-    }
   }
 
   const handleQuantityChange = (id: string, newQuantity: number, selectedColor?: string, selectedSize?: string) => {
@@ -468,15 +408,7 @@ const CartPage = () => {
 
               {/* Checkout Buttons */}
               <div className="space-y-4">
-                <Button 
-                  size="lg" 
-                  className='w-full'
-                  onClick={makePayment}
-                  disabled={isLoading}
-                >
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-                </Button>
+                <BuyButton cart={cart} />
                 <Link href="/">
                   <Button variant="outline" size="lg" className="w-full">
                     <ArrowLeft className="mr-2 h-5 w-5" />

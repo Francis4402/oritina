@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
                   email: foundUser.email,
                   name: foundUser.name,
                   image: foundUser.image,
+                  address: foundUser.address,
                   role: foundUser.role,
                 };
               } catch (error) {
@@ -83,6 +84,7 @@ export const authOptions: NextAuthOptions = {
               name: user.name ?? "",
               email: user.email ?? "",
               image: user.image ?? "",
+              address: user.address ?? "",
               role: "User",
             });
           }

@@ -43,6 +43,7 @@ const AddProductForm = () => {
       color: [''],
       price: 0,
       size: [],
+      quantity: 0,
       category: '',
       spcefication: [''],
     }
@@ -57,17 +58,9 @@ const AddProductForm = () => {
       }
 
       const productData = {
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        productImage: imageUrls,
-        category: data.category,
-        size: selectedSizes,
+        ...data,
         spcefication: data.spcefication.filter(spec => spec.trim() !== ''),
-        producttype: data.producttype,
         color: data.color.filter(color => color.trim() !== ''),
-        totalRating: "0",
-        reviews: "0"
       };
 
       const res = await createProduct(productData);
@@ -198,6 +191,30 @@ const AddProductForm = () => {
               </FormItem>
             )} />
 
+            <FormField control={form.control} name="category" render={({field}) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                    </FormControl>
+
+                    <SelectContent>
+                      {
+                        category.map((item: category) => (
+                          <SelectItem key={item?.id} value={item?.category}>
+                            {item?.category}
+                          </SelectItem>
+                        ))
+                      }
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
             <FormField control={form.control} name='producttype' render={({field}) => (
               <FormItem>
                 <FormLabel>Product Type</FormLabel>
@@ -218,46 +235,38 @@ const AddProductForm = () => {
               </FormItem>
             )} />
 
-            <FormField control={form.control} name='size' render={() => (
-              <FormItem>
-                <FormLabel>Product Size</FormLabel>
-                <div className="flex flex-wrap gap-2">
-                  {sizeOptions.map((size) => (
-                    <Button
-                      key={size}
-                      type="button"
-                      variant={selectedSizes.includes(size) ? "default" : "outline"}
-                      onClick={() => handleSizeToggle(size)}
-                      className="rounded-md"
-                    >
-                      {size}
-                    </Button>
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="category" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl className='w-full'>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {category.map((item: category) => (
-                      <SelectItem key={item?.id} value={item?.category}>
-                        {item?.category}
-                      </SelectItem>
+            <div className='flex justify-between items-center'>
+              <FormField control={form.control} name='size' render={() => (
+                <FormItem>
+                  <FormLabel>Product Size</FormLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {sizeOptions.map((size) => (
+                      <Button
+                        key={size}
+                        type="button"
+                        variant={selectedSizes.includes(size) ? "default" : "outline"}
+                        onClick={() => handleSizeToggle(size)}
+                        className="rounded-md"
+                      >
+                        {size}
+                      </Button>
                     ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              
+              <FormField control={form.control} name="quantity" render={({field}) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <FormControl>
+                    <Input {...field} type='number' value={field.value || ""} onChange={(e) => field.onChange(Number(e.target.value) || 0)} placeholder='Enter Quantity' />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
+
 
             {/*Dynamic Spcefication */}
             <FormField control={form.control} name="spcefication" render={({field}) => (

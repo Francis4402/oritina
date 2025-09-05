@@ -1,16 +1,16 @@
 export const publicRoutes = [
-    "/", "/blogs", "/aboutus",
+    "/", "/blogs", "/aboutus", "/shop", "/product/:id", "/blogs/:id",
 ];
 
 export const adminRoutes = [
-    "/dashboard", "/", "/:id", "/projects/:id", "/blogs/:id", "/dashboard/projects", "/dashboard/blogs", "/dashboard/messages"
+    "/dashboard", "/product/:id", "/blogs/:id", "/dashboard/comments", "/dashboard/products", "/dashboard/blogs", "/dashboard/category"
 ];
 
 export const userRoutes = [
-    "/", "/:id", "/projects/:id", "/blogs/:id",
+    "/:id", "/product/:id", "/blogs/:id",
 ];
 
-export const authRoutes = ["/signin", "/singup"];
+export const authRoutes = ["/login", "/register"];
 
 
 export const DEFAULT_LOGIN_REDIRECT = "/";

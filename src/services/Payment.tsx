@@ -1,40 +1,28 @@
-interface Product {
-    id: string;
-    name: string;
-    price: number;
-    image: string;
-    quantity: number;
-    selectedColor?: string;
-    selectedSize?: string;
-  }
-  
-  interface CheckoutSessionResponse {
-    id?: string;
-    url?: string;
-    error?: string;
-  }
-  
-  export const createCheckoutSession = async (products: Product[]): Promise<CheckoutSessionResponse> => {
-    try {
-      const res = await fetch(`${process.env.BASE_URL}/api/create-payment-intent`, {
+"use server"
+
+import { authOptions } from "@/app/utils/authOptions";
+import { CartItem } from "@/lib/store";
+import { getServerSession } from "next-auth";
+
+
+export const paymentService = async (cart: CartItem[]) => {
+  try {
+
+    const session = await getServerSession(authOptions);
+
+    const res = await fetch('http://localhost:3000/api/create-payment-intent', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session?.accessToken}`
         },
-        body: JSON.stringify({ products }),
-      });
-  
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || `HTTP error! status: ${res.status}`);
-      }
-  
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      console.error('Checkout session creation error:', error);
-      return { 
-        error: error instanceof Error ? error.message : 'Failed to create checkout session' 
-      };
-    }
-  }
+        body: JSON.stringify({ cart }),
+    })
+
+    const data = await res.json();
+
+    console.log(data);
+} catch (error) {
+    console.log(error);
+}
+}
