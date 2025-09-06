@@ -20,7 +20,8 @@ import Link from 'next/link'
 import { useCartStore } from '@/lib/store'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import BuyButton from '@/components/ui/buyButton'
+import BuyButton from '@/components/BuyButton'
+
 
 
 

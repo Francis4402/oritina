@@ -6,11 +6,13 @@ export interface CartItem {
   name: string
   price: number
   productImage: string[]
+  description: string
   quantity: number
   selectedColor?: string
   selectedSize?: string
   totalRating?: string
   category?: string
+  url?: string
   availableColors?: string[]
   availableSizes?: string[]
 }
