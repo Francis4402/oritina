@@ -262,6 +262,7 @@ const CartPage = () => {
                           alt={item.name}
                           width={96}
                           height={96}
+                          sizes='(max-width: 768px) 100vw, 33vw'
                           className="w-24 h-24 object-cover rounded-lg"
                         />
                       </div>

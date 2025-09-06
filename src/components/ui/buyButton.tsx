@@ -4,65 +4,28 @@ import { CreditCard, Loader2 } from 'lucide-react'
 import { Button } from './button'
 import { useState } from 'react'
 import { CartItem } from '@/lib/store'
+import { paymentService } from '@/services/Payment'
 import { toast } from 'sonner'
 
-interface BuyButtonProps {
-    cart: CartItem[]
-}
 
-const BuyButton = ({ cart }: BuyButtonProps) => {
+
+const BuyButton = ({ cart }: {cart: CartItem[]}) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const handleCheckout = async () => {
         try {
-            setIsLoading(true)
+            const data = await paymentService(cart)
+
+            if (data.status === 200) {
+                toast.success('Processing checkout...')
+            } else {
+                toast.error('Error processing checkout. Please try again later.')
+            }
             
-            if (!cart || cart.length === 0) {
-                toast.error("Cart is empty")
-                return
-            }
-
-            // Get JWT token from localStorage or your auth system
-            const token = localStorage.getItem('token') // Adjust based on your auth implementation
-            
-            if (!token) {
-                toast.error("Please log in to continue")
-                // Redirect to login page
-                window.location.href = '/login'
-                return
-            }
-
-            console.log('Creating checkout session with cart:', cart)
-
-            const response = await fetch('/api/create-payment-intent', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(cart), // Send cart array directly
-            })
-
-            if (!response.ok) {
-                const errorData = await response.json()
-                throw new Error(errorData.error || 'Failed to create checkout session')
-            }
-
-            const { url, sessionId } = await response.json()
-            
-            if (!url) {
-                throw new Error('No checkout URL received')
-            }
-
-            // Redirect to Stripe Checkout
-            window.location.href = url
-
         } catch (error) {
-            console.error('Checkout error:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Failed to start checkout'
-            toast.error(errorMessage)
+            console.log(error);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
