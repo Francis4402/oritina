@@ -22,31 +22,33 @@ import Image from 'next/image'
 import { toast } from 'sonner'
 import BuyButton from '@/components/BuyButton'
 
-
-
-
-
 const CartPage = () => {
   const {
     cart,
     removeFromCart,
     updateQuantity,
-    getTotalPrice,
-    getTotalItems,
-    clearCart
+    clearCart,
+    getSubtotal,
+    getTax,
+    getShipping,
+    getPromoDiscount,
+    getTotal,
+    getFreeShippingProgress,
+    getAmountToFreeShipping,
+    getTotalItems
   } = useCartStore()
 
-
-  const subtotal = getTotalPrice()
+  // Calculate values from the store
+  const subtotal = getSubtotal()
+  const tax = getTax()
+  const shipping = getShipping()
+  const promoDiscount = getPromoDiscount()
+  const total = getTotal()
+  const freeShippingProgress = getFreeShippingProgress()
+  const amountToFreeShipping = getAmountToFreeShipping()
   const totalItems = getTotalItems()
-  const tax = subtotal * 0.08
-  const shipping = subtotal >= 75 ? 0 : 9.99
-  const promoDiscount = subtotal >= 75 ? subtotal * 0.1 : 0
-  const total = subtotal + tax + shipping - promoDiscount
-  const freeShippingProgress = Math.min(100, (subtotal / 75) * 100)
-  const amountToFreeShipping = Math.max(0, 75 - subtotal)
 
-
+  console.log(total);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -128,19 +130,17 @@ const CartPage = () => {
             <CardContent>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-gray-700">Free shipping progress</span>
-                  <span className="text-sm text-blue-600">
-                    {subtotal >= 75 ? 'Free shipping unlocked! 🎉' : `$${amountToFreeShipping.toFixed(2)} to go`}
-                  </span>
-                  
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${freeShippingProgress}%` }}
-                  ></div>
+                <span className="text-sm text-blue-600">
+                  {subtotal >= 75 ? 'Free shipping unlocked! 🎉' : `$${amountToFreeShipping.toFixed(2)} to go`}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${freeShippingProgress}%` }}
+                ></div>
               </div>
             </CardContent>
-            
           </Card>
         </div>
 
@@ -379,13 +379,8 @@ const CartPage = () => {
                     <div className="flex justify-between">
                       <span className="flex items-center gap-2">
                         Shipping
-                        {subtotal >= 75 ? (
-                          <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">FREE</Badge>
-                        ) : (
-                          <span>$9.99</span>
-                        )}
                       </span>
-                      <span>{subtotal >= 75 ? '$0.00' : '$9.99'}</span>
+                      <span>${shipping.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tax</span>
@@ -410,7 +405,7 @@ const CartPage = () => {
 
               {/* Checkout Buttons */}
               <div className="space-y-4">
-                <BuyButton cart={cart} />
+                <BuyButton cart={cart} total={total} />
                 <Link href="/">
                   <Button variant="outline" size="lg" className="w-full">
                     <ArrowLeft className="mr-2 h-5 w-5" />

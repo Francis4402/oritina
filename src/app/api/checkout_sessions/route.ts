@@ -5,7 +5,7 @@ import { stripe } from '@/lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
-    const { cart }: { cart: CartItem[] } = await req.json();
+    const { cart, total }: { cart: CartItem[], total: number } = await req.json();
 
     if (!cart || cart.length === 0) {
         return NextResponse.json(
@@ -27,10 +27,9 @@ export async function POST(req: NextRequest) {
           },
           unit_amount: Math.round(item.price * 100),
         },
-        quantity: item.quantity || 1,
+        quantity: item.quantity,
     }));
 
-    // Create Checkout Sessions from body params.
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items,
@@ -40,11 +39,23 @@ export async function POST(req: NextRequest) {
         metadata: {
           cart_items: JSON.stringify(cart),
         },
+        custom_fields: [
+          {
+            key: "name",
+            label: {type: "custom", custom: "Name"},
+            type: "text",
+          },
+          {
+            key: "location",
+            label: {type: "custom", custom: "Delivery Location"},
+            type: "text",
+          }
+        ],
       });
 
       console.log(session.url);
 
-    return NextResponse.redirect(session.url!, 303)
+    return NextResponse.json({url: session.url});
   } catch (error) {
     return NextResponse.json(
       { error: error },

@@ -7,21 +7,22 @@ import { CartItem } from '@/lib/store'
 import { paymentService } from '@/services/Payment'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
+import { useRouter } from 'next/navigation'
 
-const BuyButton = ({ cart }: { cart: CartItem[] }) => {
+const BuyButton = ({ cart, total }: { cart: CartItem[], total: number }) => {
   const [isLoading, setIsLoading] = useState(false)
+
+  const router = useRouter();
 
   const handleCheckout = async () => {
     setIsLoading(true)
     try {
-      const data = await paymentService(cart)
+      const {url} = await paymentService(cart)
 
-      console.log(data);
-
-      if (data && data.url) {
+      if (url) {
         toast.success('Redirecting to checkout...')
         
-        // window.location.href = data.url;
+        router.push(url)
       } else {
         toast.error("No checkout URL found. Please try again.")
       }
