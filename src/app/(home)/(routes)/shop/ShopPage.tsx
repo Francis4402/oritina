@@ -29,16 +29,50 @@ import { toast } from 'sonner'
 
 const ShopPage = ({ products, pagination }: { products: product[], pagination: IMeta }) => {
   
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  // Track selected size and color for each product individually
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, { size: string | null; color: string | null }>>({});
   
   const router = useRouter()
   const searchParams = useSearchParams()
 
-
   const { addToCart } = useCartStore();
 
+  // Initialize selected options for each product
+  useEffect(() => {
+    const initialOptions: Record<string, { size: string | null; color: string | null }> = {};
+    products.forEach(product => {
+      initialOptions[product.id || ''] = {
+        size: null,
+        color: null
+      };
+    });
+    setSelectedOptions(initialOptions);
+  }, [products]);
+
+  const handleSizeSelect = (productId: string, size: string) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [productId]: {
+        ...prev[productId],
+        size: prev[productId]?.size === size ? null : size // Toggle selection
+      }
+    }));
+  };
+
+  const handleColorSelect = (productId: string, color: string) => {
+    setSelectedOptions(prev => ({
+      ...prev,
+      [productId]: {
+        ...prev[productId],
+        color: prev[productId]?.color === color ? null : color // Toggle selection
+      }
+    }));
+  };
+
   const handleAddToCart = (product: product) => {
+    const productId = product.id || '';
+    const selectedSize = selectedOptions[productId]?.size;
+    const selectedColor = selectedOptions[productId]?.color;
 
     if (product.size && product.size.length > 0 && !selectedSize) {
       toast.error("Please select a size first");
@@ -46,16 +80,17 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
     }
     
     if (product.color && product.color.length > 0 && !selectedColor) {
-        toast.error("Please select a color first");
-        return;
+      toast.error("Please select a color first");
+      return;
     }
 
     try {
       addToCart({
-        id: product.id || '',
+        id: productId,
         name: product.name,
         price: product.price,
         productImage: product.productImage,
+        description: product.description,
         category: product.category,
         totalRating: product.totalRating,
         quantity: 1,
@@ -368,12 +403,17 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
           <div className={viewMode === 'grid'
             ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'
             : 'space-y-6 mb-8'}>
-            {products.map((product) => (
-              <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <CardContent>
-                <div className={`relative ${viewMode === 'list' ? 'flex' : ''}`}>
+            {products.map((product) => {
+              const productId = product.id || '';
+              const selectedSize = selectedOptions[productId]?.size;
+              const selectedColor = selectedOptions[productId]?.color;
+              
+              return (
+                <Card key={productId} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <CardContent>
+                    <div className={`relative ${viewMode === 'list' ? 'flex' : ''}`}>
                       <div className={`bg-blue-100`}>
-                        <Link href={`/product/${product.id}`}>
+                        <Link href={`/product/${productId}`}>
                           <Image src={product.productImage[0]} alt="T-shirt" width={500} height={500} />
                         </Link>
 
@@ -400,38 +440,42 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
                           </div>
                           <div className='flex items-center gap-1'>
                             {product.color.map((color, index) => (
-                                <div 
-                                    key={index}
-                                    className={`w-5 h-5 rounded-full border cursor-pointer ${selectedColor === color ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-                                    style={{ backgroundColor: color }}
-                                    title={color}
-                                    onClick={() => setSelectedColor(color)}
-                                />
-                              ))}
+                              <div 
+                                key={index}
+                                className={`w-5 h-5 rounded-full border cursor-pointer ${selectedColor === color ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+                                style={{ backgroundColor: color }}
+                                title={color}
+                                onClick={() => handleColorSelect(productId, color)}
+                              />
+                            ))}
                           </div>
                         </div>
                         
                         <p className="text-gray-600 text-sm items-center mt-1">{product.reviews} reviews</p>
                         
                         <div className='flex gap-1 flex-wrap mt-2'>
-                          {
-                            product.size.map((s, index) => (
-                              <Button key={index} variant={selectedSize === s ? "default" : "outline"} size={"sm"} onClick={(e) => { e.preventDefault(), e.stopPropagation(), setSelectedSize(s)}}>
-                                {s}
-                              </Button>
-                            ))
-                          }
+                          {product.size.map((s, index) => (
+                            <Button 
+                              key={index} 
+                              variant={selectedSize === s ? "default" : "outline"} 
+                              size={"sm"} 
+                              onClick={() => handleSizeSelect(productId, s)}
+                            >
+                              {s}
+                            </Button>
+                          ))}
                         </div>
 
                         <div className="flex items-center justify-between mt-3">
                           <span className="font-bold text-lg">${product.price}</span>
-                          <Button onClick={(e) => handleAddToCart(product)} size="sm">Add to Cart</Button>
+                          <Button onClick={() => handleAddToCart(product)} size="sm">Add to Cart</Button>
                         </div>
                       </div>
                     </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           

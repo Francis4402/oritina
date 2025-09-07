@@ -1,13 +1,13 @@
 import { CartItem } from "@/lib/store";
 
-export const paymentService = async (cart: CartItem[]) => {
+export const paymentService = async (cart: CartItem[], total: number) => {
   try {
     const res = await fetch('http://localhost:3000/api/checkout_sessions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ cart }),
+      body: JSON.stringify({ cart, total }),
     })
 
     

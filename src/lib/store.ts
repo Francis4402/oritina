@@ -116,7 +116,7 @@ export const useCartStore = create<CartStore>()(
 
         getSubtotal: () => get().cart.reduce((total, item) => total + item.price * item.quantity, 0),
         getTax: () => get().getSubtotal() * 0.08,
-        getShipping: () => (get().getSubtotal() >= 75 ? 0 : 9.99),
+        getShipping: () => (get().getSubtotal() >= 75 ? 0 : 1),
         getPromoDiscount: () => (get().getSubtotal() >= 75 ? get().getSubtotal() * 0.1 : 0),
         getTotal: () => get().getSubtotal() + get().getTax() + get().getShipping() - get().getPromoDiscount(),
         getFreeShippingProgress: () => Math.min(100, (get().getSubtotal() / 75) * 100),

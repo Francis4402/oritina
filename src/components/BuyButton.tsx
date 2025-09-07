@@ -17,7 +17,7 @@ const BuyButton = ({ cart, total }: { cart: CartItem[], total: number }) => {
   const handleCheckout = async () => {
     setIsLoading(true)
     try {
-      const {url} = await paymentService(cart)
+      const {url} = await paymentService(cart, total)
 
       if (url) {
         toast.success('Redirecting to checkout...')

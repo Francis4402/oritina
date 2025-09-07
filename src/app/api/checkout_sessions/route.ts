@@ -17,17 +17,18 @@ export async function POST(req: NextRequest) {
     const headersList = await headers()
     const origin = headersList.get('origin') || 'http://localhost:3000'
 
+    
     const line_items = cart.map((item: CartItem) => ({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: item.name,
-            description: item.description || undefined,
-            images: item.productImage ? [item.productImage[0]] : undefined,
-          },
-          unit_amount: Math.round(item.price * 100),
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+          description: item.description || `Color: ${item.selectedColor || 'N/A'}, Size: ${item.selectedSize || 'N/A'}`,
+          images: item.productImage && item.productImage.length > 0 ? [item.productImage[0]] : undefined,
         },
-        quantity: item.quantity,
+        unit_amount: Math.round(item.price * 100),
+      },
+      quantity: item.quantity,
     }));
 
     const session = await stripe.checkout.sessions.create({
@@ -35,9 +36,19 @@ export async function POST(req: NextRequest) {
         line_items,
         mode: 'payment',
         success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/?canceled=true`,
+        cancel_url: `${origin}/cart?canceled=true`,
         metadata: {
-          cart_items: JSON.stringify(cart),
+          cart_items: JSON.stringify(cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.productImage && item.productImage.length > 0 ? item.productImage[0] : null,
+            color: item.selectedColor,
+            size: item.selectedSize
+          }))),
+          total_amount: total.toFixed(2),
+          item_count: cart.reduce((sum, item) => sum + item.quantity, 0).toString(),
         },
         custom_fields: [
           {
@@ -53,12 +64,11 @@ export async function POST(req: NextRequest) {
         ],
       });
 
-      console.log(session.url);
-
     return NextResponse.json({url: session.url});
   } catch (error) {
+    console.error('Checkout error:', error);
     return NextResponse.json(
-      { error: error },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }
