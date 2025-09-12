@@ -39,7 +39,7 @@ export const categoriesTable = pgTable("categories", {
   category: varchar({ length: 255 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-})
+});
 
 export const blogsTable = pgTable("blogs", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -66,7 +66,7 @@ export const likeTable = pgTable("likes", {
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-})
+});
 
 export const ratingTable = pgTable("rating", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -75,5 +75,13 @@ export const ratingTable = pgTable("rating", {
   rating: varchar({ length: 255 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-})
+});
 
+export const orderTable = pgTable("orders", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  productId: uuid("product_id").references(() => productsTable.id).array().notNull(),
+  userId: uuid("user_id").references(() => usersTable.id).notNull(),
+  quantity: varchar({length: 1000}).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});

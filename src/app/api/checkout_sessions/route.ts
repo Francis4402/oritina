@@ -5,7 +5,7 @@ import { stripe } from '@/lib/stripe';
 
 export async function POST(req: NextRequest) {
   try {
-    const { cart, total }: { cart: CartItem[], total: number } = await req.json();
+    const { cart }: { cart: CartItem[] } = await req.json();
 
     if (!cart || cart.length === 0) {
         return NextResponse.json(
@@ -17,19 +17,68 @@ export async function POST(req: NextRequest) {
     const headersList = await headers()
     const origin = headersList.get('origin') || 'http://localhost:3000'
 
-    
-    const line_items = cart.map((item: CartItem) => ({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: item.name,
-          description: item.description || `Color: ${item.selectedColor || 'N/A'}, Size: ${item.selectedSize || 'N/A'}`,
-          images: item.productImage && item.productImage.length > 0 ? [item.productImage[0]] : undefined,
+    // Calculate subtotal from cart
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const shipping = subtotal >= 75 ? 0 : 1;
+    const tax = +(subtotal * 0.08).toFixed(2);
+    // If you have promo discount logic, add it here
+    const promoDiscount = subtotal >= 75 ? +(subtotal * 0.1).toFixed(2) : 0;
+    const total = subtotal + tax + shipping - promoDiscount;
+
+    const line_items = [
+      ...cart.map((item: CartItem) => ({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.name,
+            description: item.description || `Color: ${item.selectedColor || 'N/A'}, Size: ${item.selectedSize || 'N/A'}`,
+            images: item.productImage && item.productImage.length > 0 ? [item.productImage[0]] : undefined,
+          },
+          unit_amount: Math.round(item.price * 100),
         },
-        unit_amount: Math.round(item.price * 100),
+        quantity: item.quantity,
+      })),
+      // Shipping line item if applicable
+      ...(shipping > 0
+        ? [{
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'Shipping',
+                description: 'Standard shipping fee',
+              },
+              unit_amount: Math.round(shipping * 100),
+            },
+            quantity: 1,
+          }]
+        : []),
+      // Tax line item
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Tax',
+            description: 'Sales tax',
+          },
+          unit_amount: Math.round(tax * 100),
+        },
+        quantity: 1,
       },
-      quantity: item.quantity,
-    }));
+      // Promo discount as negative line item if applicable
+      ...(promoDiscount > 0
+        ? [{
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'Promo Discount',
+                description: '10% off order',
+              },
+              unit_amount: -Math.round(promoDiscount * 100),
+            },
+            quantity: 1,
+          }]
+        : []),
+    ];
 
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],

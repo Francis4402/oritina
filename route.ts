@@ -1,5 +1,5 @@
 export const publicRoutes = [
-    "/", "/blogs", "/aboutus", "/shop", "/product/:id", "/blogs/:id", "/success?session_id=:session_id", "/cancel?session_id=:session_id"
+    "/", "/blogs", "/aboutus", "/shop", "/product/:id", "/blogs/:id", "/success", "/cancel"
 ];
 
 export const adminRoutes = [
