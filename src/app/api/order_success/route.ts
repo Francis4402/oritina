@@ -30,9 +30,17 @@ export async function POST(req: NextRequest) {
 
     const stripeSession = await stripe.checkout.sessions.retrieve(session_id);
 
-    // Extract values from metadata (convert to cents)
+    // Get custom delivery location from Stripe custom_fields
+    let shippingAddress = "";
+    if (stripeSession.custom_fields && Array.isArray(stripeSession.custom_fields)) {
+      const locationField = stripeSession.custom_fields.find(
+        (field: any) => field.key === "location"
+      );
+      shippingAddress = locationField?.text?.value || "";
+    }
+
     const cart_items = JSON.parse(stripeSession.metadata?.cart_items || "[]");
-    const total = stripeSession.amount_total || 0; // Stripe always returns cents
+    const total = stripeSession.amount_total || 0;
     const shipping = stripeSession.metadata?.shipping_amount
       ? Math.round(parseFloat(stripeSession.metadata.shipping_amount) * 100)
       : 0;
@@ -49,6 +57,7 @@ export async function POST(req: NextRequest) {
         total,
         shipping,
         tax,
+        shippingAddress,
       })
       .returning();
 

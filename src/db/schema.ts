@@ -1,4 +1,3 @@
-
 import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer, boolean } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum('user_role', ['User', 'Admin']);
@@ -85,6 +84,7 @@ export const orderTable = pgTable("orders", {
   total: integer("total").notNull(),
   shipping: integer("shipping").notNull(),
   tax: integer("tax").notNull(),
+  shippingAddress: text("shipping_address").notNull(),
   order: orderStatusEnum("order_status").notNull().default("Pending"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

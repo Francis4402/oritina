@@ -5,7 +5,8 @@ import { CartItem } from '@/app/types/Types';
 
 export async function POST(req: NextRequest) {
   try {
-    const { cart }: { cart: CartItem[] } = await req.json();
+    // Extract cart and shippingAddress from request body
+    const { cart, shippingAddress }: { cart: CartItem[]; shippingAddress: any } = await req.json();
 
     if (!cart || cart.length === 0) {
         return NextResponse.json(
@@ -21,7 +22,6 @@ export async function POST(req: NextRequest) {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = subtotal >= 75 ? 0 : 1;
     const tax = +(subtotal * 0.08).toFixed(2);
-    // If you have promo discount logic, add it here
     const promoDiscount = subtotal >= 75 ? +(subtotal * 0.1).toFixed(2) : 0;
     const total = subtotal + tax + shipping - promoDiscount;
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
           total_amount: total.toFixed(2),
           shipping_amount: shipping.toFixed(2),
           tax_amount: tax.toFixed(2),
-          item_count: cart.reduce((sum, item) => sum + item.quantity, 0).toString(),
+          shipping_address: JSON.stringify(shippingAddress),
         },
         custom_fields: [
           {
