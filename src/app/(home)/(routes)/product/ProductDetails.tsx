@@ -53,6 +53,7 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
             category: productData.category,
             totalRating: productData.totalRating,
             quantity: quantity,
+            description: productData.description,
             selectedColor: selectedColor || undefined,
             selectedSize: selectedSize || undefined,
             availableColors: productData.color,
