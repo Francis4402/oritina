@@ -176,7 +176,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Milestones Section */}
+      {/* Milestones Section - Fixed */}
       <section className="py-16 bg-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -188,41 +188,41 @@ const AboutPage = () => {
           </div>
 
           <div className="relative">
+            {/* Timeline line */}
             <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-primary/20"></div>
             
             <div className="space-y-12">
               {milestones.map((milestone, index) => (
-                <div key={index} className={`flex ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'} items-center`}>
-                  <div className="w-1/2 pr-8 flex justify-end">
-                    {index % 2 === 0 && (
-                      <Card className="w-full max-w-md">
-                        <CardHeader>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="h-5 w-5 text-primary" />
-                            <CardTitle>{milestone.year}</CardTitle>
-                          </div>
-                          <CardDescription className="text-lg">{milestone.event}</CardDescription>
-                        </CardHeader>
-                      </Card>
-                    )}
+                <div key={index} className="relative flex items-center justify-between">
+                  {/* Left side content (even indexes) */}
+                  <div className={`w-5/12 ${index % 2 === 0 ? '' : 'invisible'}`}>
+                    <Card className="ml-auto mr-8 w-full max-w-md">
+                      <CardHeader>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Calendar className="h-5 w-5 text-primary" />
+                          <CardTitle>{milestone.year}</CardTitle>
+                        </div>
+                        <CardDescription className="text-lg">{milestone.event}</CardDescription>
+                      </CardHeader>
+                    </Card>
                   </div>
                   
-                  <div className="relative">
+                  {/* Timeline dot */}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
                     <div className="w-6 h-6 rounded-full bg-primary border-4 border-white"></div>
                   </div>
                   
-                  <div className="w-1/2 pl-8">
-                    {index % 2 !== 0 && (
-                      <Card className="w-full max-w-md">
-                        <CardHeader>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="h-5 w-5 text-primary" />
-                            <CardTitle>{milestone.year}</CardTitle>
-                          </div>
-                          <CardDescription className="text-lg">{milestone.event}</CardDescription>
-                        </CardHeader>
-                      </Card>
-                    )}
+                  {/* Right side content (odd indexes) */}
+                  <div className={`w-5/12 ${index % 2 !== 0 ? '' : 'invisible'}`}>
+                    <Card className="mr-auto ml-8 w-full max-w-md">
+                      <CardHeader>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Calendar className="h-5 w-5 text-primary" />
+                          <CardTitle>{milestone.year}</CardTitle>
+                        </div>
+                        <CardDescription className="text-lg">{milestone.event}</CardDescription>
+                      </CardHeader>
+                    </Card>
                   </div>
                 </div>
               ))}
@@ -233,18 +233,18 @@ const AboutPage = () => {
 
       {/* CTA Section */}
       <section className="py-16 container mx-auto px-4">
-        <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-center border-0 py-12">
+        <Card className="text-center border-0 py-12 shadow-xl">
           <CardHeader>
             <CardTitle className="text-3xl">Join Our Journey</CardTitle>
-            <CardDescription className="text-primary-foreground/80 text-lg">
+            <CardDescription className="text-lg">
               Become part of our story and discover fashion that makes a difference.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg">
+            <Button variant="default" size="lg">
               Shop Now
             </Button>
-            <Button variant="outline" className="bg-transparent text-white border-white" size="lg">
+            <Button variant="outline" size="lg">
               Contact Us
             </Button>
           </CardContent>

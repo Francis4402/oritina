@@ -82,7 +82,7 @@ const BlogPage = () => {
     : blogPosts.filter(post => post.category === activeCategory)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="container mx-auto py-8 px-4">
         <div className="flex flex-col items-center text-center mb-12">
@@ -201,28 +201,6 @@ const BlogPage = () => {
             </Card>
           ))}
         </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="container mx-auto px-4 mb-16">
-        <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground border-0 text-center py-12">
-          <CardHeader>
-            <CardTitle className="text-3xl">Stay Updated</CardTitle>
-            <CardDescription className="text-primary-foreground/80">
-              Subscribe to our newsletter for the latest articles and updates
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="max-w-md mx-auto">
-            <div className="flex gap-2">
-              <Input 
-                type="email" 
-                placeholder="Your email address" 
-                className="bg-background text-foreground"
-              />
-              <Button variant="secondary">Subscribe</Button>
-            </div>
-          </CardContent>
-        </Card>
       </section>
 
     </div>
