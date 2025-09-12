@@ -3,14 +3,14 @@
 import { CreditCard, Loader2 } from 'lucide-react'
 
 import { useState } from 'react'
-import { CartItem } from '@/lib/store'
 import { paymentService } from '@/services/Payment'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
 import { useRouter } from 'next/navigation'
+import { CartItem } from '@/app/types/Types'
 
 const BuyButton = ({ cart, total }: { cart: CartItem[], total: number }) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 

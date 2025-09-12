@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { CartItem } from '@/lib/store'
 import { stripe } from '@/lib/stripe';
+import { CartItem } from '@/app/types/Types';
 
 export async function POST(req: NextRequest) {
   try {
@@ -97,6 +97,8 @@ export async function POST(req: NextRequest) {
             size: item.selectedSize
           }))),
           total_amount: total.toFixed(2),
+          shipping_amount: shipping.toFixed(2),
+          tax_amount: tax.toFixed(2),
           item_count: cart.reduce((sum, item) => sum + item.quantity, 0).toString(),
         },
         custom_fields: [

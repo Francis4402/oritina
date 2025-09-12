@@ -2,6 +2,7 @@
 import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer, boolean } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum('user_role', ['User', 'Admin']);
+export const orderStatusEnum = pgEnum('order_status', ['Pending', 'Shipped', 'Delivered', 'Cancelled']);
 
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -79,9 +80,11 @@ export const ratingTable = pgTable("rating", {
 
 export const orderTable = pgTable("orders", {
   id: uuid("id").primaryKey().defaultRandom(),
-  productId: uuid("product_id").references(() => productsTable.id).array().notNull(),
-  userId: uuid("user_id").references(() => usersTable.id).notNull(),
-  quantity: varchar({length: 1000}).notNull(),
+  userId: uuid("user_id").notNull(),
+  products: text("products").notNull(),
+  total: integer("total").notNull(),
+  shipping: integer("shipping").notNull(),
+  tax: integer("tax").notNull(),
+  order: orderStatusEnum("order_status").notNull().default("Pending"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -48,7 +48,6 @@ const CartPage = () => {
   const amountToFreeShipping = getAmountToFreeShipping()
   const totalItems = getTotalItems()
 
-  console.log(total);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (

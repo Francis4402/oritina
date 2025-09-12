@@ -72,4 +72,36 @@ export interface SearchParams {
     page?: string;
     view?: string;
 }
-  
+
+export interface CartItem {
+  id: string
+  name: string
+  price: number
+  productImage: string[]
+  description: string
+  quantity: number
+  selectedColor?: string
+  selectedSize?: string
+  totalRating?: string
+  category?: string
+  availableColors?: string[]
+  availableSizes?: string[]
+}
+
+export interface CartStore {
+  cart: CartItem[]
+  addToCart: (product: CartItem) => void
+  removeFromCart: (id: string, selectedColor?: string, selectedSize?: string) => void
+  updateQuantity: (id: string, quantity: number, selectedColor?: string, selectedSize?: string) => void
+  clearCart: () => void
+  getTotalItems: () => number
+  getItemQuantity: (id: string, selectedColor?: string, selectedSize?: string) => number
+  getItemById: (id: string, selectedColor?: string, selectedSize?: string) => CartItem | undefined
+  getSubtotal: () => number
+  getTax: () => number
+  getShipping: () => number
+  getPromoDiscount: () => number
+  getTotal: () => number
+  getFreeShippingProgress: () => number
+  getAmountToFreeShipping: () => number
+}

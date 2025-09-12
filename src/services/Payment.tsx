@@ -1,4 +1,5 @@
-import { CartItem } from "@/lib/store";
+import { CartItem } from "@/app/types/Types";
+
 
 export const paymentService = async (cart: CartItem[], total: number) => {
   try {
