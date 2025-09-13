@@ -2,6 +2,7 @@ import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer, boolean } fro
 
 export const userRoleEnum = pgEnum('user_role', ['User', 'Admin']);
 export const orderStatusEnum = pgEnum('order_status', ['Pending', 'Shipped', 'Delivered', 'Cancelled']);
+export const blogCategoryEnum = pgEnum('category_status', ['fashion', 'lifestyle', 'trends', 'sustainability']);
 
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -45,7 +46,11 @@ export const blogsTable = pgTable("blogs", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar({ length: 255 }).notNull(),
   description: text("description").notNull(),
+  category: blogCategoryEnum().notNull(),
   blogImage: text("blog_image").notNull(),
+  readTime: integer("read_time").notNull(),
+  likes: uuid("likes").references(() => likeTable.id).notNull(),
+  comments: uuid("comments").references(() => commentTable.id).notNull(),
   blogtype: varchar("blog_type", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -53,7 +58,6 @@ export const blogsTable = pgTable("blogs", {
 
 export const commentTable = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  blogId: uuid("blog_id").references(() => blogsTable.id).notNull(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
   comment: text("comment").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -62,7 +66,6 @@ export const commentTable = pgTable("comments", {
 
 export const likeTable = pgTable("likes", {
   id: uuid("id").primaryKey().defaultRandom(),
-  blogId: uuid("blog_id").references(() => blogsTable.id).notNull(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
