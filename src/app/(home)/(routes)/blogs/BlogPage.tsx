@@ -173,9 +173,8 @@ const BlogPage = ({ blogs }: BlogPageProps) => {
                 <CardFooter className="flex justify-between pt-3">
                   <div className="flex items-center gap-2">
                       <LikeButton 
-                        blogId={post.id} 
-                        initialLikes={post.likes || 0} 
-                        initialUserLiked={false} 
+                        blogId={post.id!} 
+                        
                       />
                     <Button variant="ghost" size="sm" className="h-8 gap-1">
                       <MessageCircle className="h-4 w-4" />

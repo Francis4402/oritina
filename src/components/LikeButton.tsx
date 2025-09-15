@@ -11,7 +11,7 @@ interface LikeButtonProps {
 }
 
 export function LikeButton({ blogId}: LikeButtonProps) {
-  const [userLiked, setUserLiked] = useState();
+  const [userLiked, setUserLiked] = useState<any[]>([]);
 
   const handleLike = async () => {
     try {
@@ -32,6 +32,7 @@ export function LikeButton({ blogId}: LikeButtonProps) {
     });
   }, []);
 
+
   return (
     <Button
       variant="ghost"
@@ -39,7 +40,7 @@ export function LikeButton({ blogId}: LikeButtonProps) {
       onClick={handleLike}
     >
       <Heart className={`h-4 w-4`} />
-      <span>{userLiked ? "Liked" : "Like"}</span>
+      <span>{userLiked?.length > 0 ? userLiked.length : 0}</span>
     </Button>
   )
 }
