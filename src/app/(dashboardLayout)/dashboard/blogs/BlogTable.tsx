@@ -2,7 +2,7 @@
 
 
 import { MainTable } from '@/app/utils/Table'
-import { deleteBlog, updateBlog } from '@/services/Blog'
+import { deleteBlog } from '@/services/Blog'
 import { ColumnDef } from '@tanstack/react-table'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -82,9 +82,9 @@ const BlogTable = ({blog}: {blog: blog[]}) => {
             cell: ({row}) => <div className="text-left">{row.getValue('description')}</div>
         },
         {
-            accessorKey: 'blogtype',
+            accessorKey: 'category',
             header: 'Blog Type',
-            cell: ({row}) => <div className="text-left">{row.getValue('blogtype')}</div>
+            cell: ({row}) => <div className="text-left">{row.getValue('category')}</div>
         },
         {
             accessorKey: 'createdAt',

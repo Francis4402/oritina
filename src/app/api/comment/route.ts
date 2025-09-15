@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
 
         const newComment = await db.insert(commentTable).values({
-            blogId: body.blogId,
             userId: body.userId,
             comment: body.comment,
             createdAt: new Date(),

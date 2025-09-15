@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
             title: body.title,
             description: body.description,
             blogImage: body.blogImage,
-            blogtype: body.blogtype,
+            category: body.category,
+            readTime: body.readTime,
             createdAt: new Date(),
             updatedAt: new Date()
         });

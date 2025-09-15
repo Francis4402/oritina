@@ -25,7 +25,7 @@ const AddBlogForm = () => {
             title: '',
             description: '',
             blogImage: '',
-            blogtype: '',
+            category: '',
         }
     });
 
@@ -89,10 +89,10 @@ const AddBlogForm = () => {
                             }
                             }}
                             onUploadError={(error: Error) => {
-                            toast.error(`Upload failed: ${error.message}`);
+                                toast.error(`Upload failed: ${error.message}`);
                             }}
                             appearance={{
-                            button: "ut-ready:bg-blue-500 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md",
+                                button: "ut-ready:bg-blue-500 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md",
                             }}
                         />
                     </div>
@@ -114,7 +114,7 @@ const AddBlogForm = () => {
 
                     
 
-                    <FormField control={form.control} name="blogtype" render={({field}) => (
+                    <FormField control={form.control} name="category" render={({field}) => (
                         <FormItem>
                             <FormLabel>Blog Type</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>

@@ -23,7 +23,10 @@ export interface blog {
     title: string;
     description: string;
     blogImage: string;
-    blogtype: string;
+    category: string;
+    readTime?: number;
+    likes?: string;
+    comments?: string;
     createdAt?: string;
     updatedAt?: string;
 }

@@ -28,7 +28,7 @@ const UpdateBlogsModel = ({ blog }: {blog: blog}) => {
             title: blog.title || '',
             description: blog.description || '',
             blogImage: blog.blogImage || '',
-            blogtype: blog.blogtype,
+            category: blog.category || '',
         }
     });
 
@@ -119,7 +119,7 @@ const UpdateBlogsModel = ({ blog }: {blog: blog}) => {
                         </FormItem>
                     )} />
 
-                    <FormField control={form.control} name="blogtype" render={({field}) => (
+                    <FormField control={form.control} name="category" render={({field}) => (
                         <FormItem>
                             <FormLabel>Blog Type</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>

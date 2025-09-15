@@ -5,12 +5,19 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'
-import { CalendarDays, Search, Heart, MessageCircle, Share, ArrowRight } from 'lucide-react'
+import { CalendarDays, Search, MessageCircle, Share, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
+import { blog } from "@/app/types/Types"
+import { format, parseISO } from 'date-fns'
+import { LikeButton } from "@/components/LikeButton"
 
+interface BlogPageProps {
+  blogs: blog[]
+}
 
-const BlogPage = () => {
-  const [activeCategory, setActiveCategory] = useState('all')
+const BlogPage = ({ blogs }: BlogPageProps) => {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   
   const categories = [
     { id: 'all', name: 'All Articles' },
@@ -20,69 +27,33 @@ const BlogPage = () => {
     { id: 'sustainability', name: 'Sustainability' },
   ]
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: "The Future of Sustainable Fashion",
-      excerpt: "How eco-friendly materials are transforming the fashion industry and what it means for consumers.",
-      category: "sustainability",
-      author: "Emma Johnson",
-      date: "May 15, 2023",
-      readTime: "6 min read",
-      image: "/clothimage/blog5.webp",
-      avatar: "https://github.com/shadcn.png",
-      likes: 42,
-      comments: 8
-    },
-    {
-      id: 2,
-      title: "Summer 2023 Trends: What to Wear",
-      excerpt: "Discover the must-have pieces and styling tips for the hottest season of the year.",
-      category: "trends",
-      author: "Alex Martinez",
-      date: "April 28, 2023",
-      readTime: "4 min read",
-      image: "/clothimage/blog2.webp",
-      avatar: "https://github.com/shadcn.png",
-      likes: 37,
-      comments: 12
-    },
-    {
-      id: 3,
-      title: "Minimalist Wardrobe: Less is More",
-      excerpt: "How to build a capsule wardrobe that works for every occasion and simplifies your life.",
-      category: "lifestyle",
-      author: "Sarah Chen",
-      date: "April 15, 2023",
-      readTime: "8 min read",
-      image: "/clothimage/blog3.webp",
-      avatar: "https://github.com/shadcn.png",
-      likes: 29,
-      comments: 5
-    },
-    {
-      id: 4,
-      title: "The Art of Layering for Fall",
-      excerpt: "Master the technique of layering to create stylish and functional outfits for cooler weather.",
-      category: "fashion",
-      author: "Michael Brooks",
-      date: "March 30, 2023",
-      readTime: "5 min read",
-      image: "/clothimage/blog4.webp",
-      avatar: "https://github.com/shadcn.png",
-      likes: 51,
-      comments: 15
-    },
-  ]
 
-  const featuredPost = blogPosts[0]
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "Recent"
+    
+    try {
+      return format(parseISO(dateString), 'MMMM dd, yyyy')
+    } catch (error) {
+      console.error('Error formatting date:', error)
+      return "Recent"
+    }
+  }
 
-  const filteredPosts = activeCategory === 'all' 
-    ? blogPosts 
-    : blogPosts.filter(post => post.category === activeCategory)
+  
+  const featuredPost = blogs.length > 0 ? blogs[0] : null
+
+  const filteredPosts = blogs.filter(post => {
+    
+    if (post.id === featuredPost?.id) return false
+    
+    const matchesCategory = activeCategory === 'all' || post.category === activeCategory
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          post.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="container mx-auto py-8 px-4">
         <div className="flex flex-col items-center text-center mb-12">
@@ -99,6 +70,8 @@ const BlogPage = () => {
             type="text" 
             placeholder="Search articles..." 
             className="pl-10 py-6 text-lg"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -109,7 +82,7 @@ const BlogPage = () => {
               key={category.id}
               variant={activeCategory === category.id ? "default" : "outline"}
               onClick={() => setActiveCategory(category.id)}
-              className="rounded-full px-6"
+              className="rounded-full px-4 py-2 text-sm md:px-6 md:text-base"
             >
               {category.name}
             </Button>
@@ -117,92 +90,111 @@ const BlogPage = () => {
         </div>
       </header>
 
-      {/* Featured Post */}
-      <section className="container mx-auto px-4 mb-16">
-        <Card className="overflow-hidden border-0 shadow-lg">
-          <div className="grid md:grid-cols-2">
-            <div className="relative h-80 md:h-auto">
-              <Image
-                src={featuredPost.image}
-                alt={featuredPost.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="flex flex-col justify-center p-8">
-              <Badge variant="secondary" className="mb-4 w-fit">{featuredPost.category}</Badge>
-              <CardTitle className="text-3xl mb-4">{featuredPost.title}</CardTitle>
-              <CardDescription className="text-lg mb-6">{featuredPost.excerpt}</CardDescription>
-              
-              <div className="flex items-center gap-4 mb-6">
-                <div>
+      {/* Featured Post - Only show if there are posts */}
+      {featuredPost && (
+        <section className="container mx-auto px-4 mb-16">
+          <Card className="overflow-hidden border-0 shadow-lg">
+            <div className="grid md:grid-cols-2">
+              <div className="relative h-80 md:h-auto">
+                <Image
+                  src={featuredPost.blogImage}
+                  alt={featuredPost.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center p-6 md:p-8">
+                <Badge variant="secondary" className="mb-4 w-fit capitalize">{featuredPost.category}</Badge>
+                <CardTitle className="text-2xl md:text-3xl mb-4">{featuredPost.title}</CardTitle>
+                <CardDescription className="text-base md:text-lg mb-6 line-clamp-3">
+                  {featuredPost.description}
+                </CardDescription>
+                
+                <div className="flex items-center gap-4 mb-6">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <CalendarDays className="h-4 w-4 mr-1" />
-                    <span className="mr-4">{featuredPost.date}</span>
+                    <span>{formatDate(featuredPost.createdAt)}</span>
                   </div>
+                  {featuredPost.readTime && (
+                    <span className="text-sm text-muted-foreground">
+                      {featuredPost.readTime} min read
+                    </span>
+                  )}
                 </div>
+                
+                <Button className="w-fit">
+                  Read Article <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
-              
-              <Button className="w-fit">
-                Read Article <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
             </div>
-          </div>
-        </Card>
-      </section>
+          </Card>
+        </section>
+      )}
 
       {/* Blog Posts Grid */}
       <section className="container mx-auto px-4 mb-16">
         <h2 className="text-3xl font-bold mb-8">Latest Articles</h2>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredPosts.map(post => (
-            <Card key={post.id} className="overflow-hidden h-full flex flex-col">
-              <div className="relative h-48">
-                <Image
-                  src={post.image}
-                  alt={post.title}
-                  fill
-                  className="object-cover"
-                />
-                <Badge variant="secondary" className="absolute top-4 left-4">
-                  {post.category}
-                </Badge>
-              </div>
-              
-              <CardHeader>
-                <CardTitle className="text-xl">{post.title}</CardTitle>
-                <CardDescription>{post.excerpt}</CardDescription>
-              </CardHeader>
-              
-              <CardContent className="flex-grow">
-                                
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <CalendarDays className="h-4 w-4 mr-1" />
-                  <span className="mr-4">{post.date}</span>
+        {filteredPosts.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {filteredPosts.map((post) => (
+              <Card key={post.id} className="overflow-hidden h-full flex flex-col transition-all hover:shadow-xl">
+                <div className="relative h-48">
+                  <Image
+                    src={post.blogImage}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                  />
+                  <Badge variant="secondary" className="absolute top-3 left-3 capitalize">
+                    {post.category}
+                  </Badge>
                 </div>
-              </CardContent>
-              
-              <CardFooter className="flex justify-between">
-                <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    <Heart className="h-4 w-4" />
-                    <span>{post.likes}</span>
+                
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl line-clamp-2">{post.title}</CardTitle>
+                  <CardDescription className="line-clamp-3">
+                    {post.description}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="pb-3">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <div className="flex items-center">
+                      <CalendarDays className="h-4 w-4 mr-1" />
+                      <span>{formatDate(post.createdAt)}</span>
+                    </div>
+                    {post.readTime && (
+                      <span>{post.readTime} min read</span>
+                    )}
+                  </div>
+                </CardContent>
+                
+                <CardFooter className="flex justify-between pt-3">
+                  <div className="flex items-center gap-2">
+                      <LikeButton 
+                        blogId={post.id} 
+                        initialLikes={post.likes || 0} 
+                        initialUserLiked={false} 
+                      />
+                    <Button variant="ghost" size="sm" className="h-8 gap-1">
+                      <MessageCircle className="h-4 w-4" />
+                      <span>{post.comments || "0"}</span>
+                    </Button>
+                  </div>
+                  <Button variant="ghost" size="sm" className="h-8">
+                    <Share className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    <MessageCircle className="h-4 w-4" />
-                    <span>{post.comments}</span>
-                  </Button>
-                </div>
-                <Button variant="ghost" size="sm">
-                  <Share className="h-4 w-4" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-xl text-muted-foreground">No articles found. Try a different search or category.</p>
+          </div>
+        )}
       </section>
-
     </div>
   )
 }

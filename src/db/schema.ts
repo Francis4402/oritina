@@ -1,8 +1,9 @@
+import { relations } from "drizzle-orm";
 import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer, boolean } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum('user_role', ['User', 'Admin']);
 export const orderStatusEnum = pgEnum('order_status', ['Pending', 'Shipped', 'Delivered', 'Cancelled']);
-export const blogCategoryEnum = pgEnum('category_status', ['fashion', 'lifestyle', 'trends', 'sustainability']);
+
 
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -46,19 +47,19 @@ export const blogsTable = pgTable("blogs", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: varchar({ length: 255 }).notNull(),
   description: text("description").notNull(),
-  category: blogCategoryEnum().notNull(),
+  category: varchar({ length: 255 }).notNull(),
   blogImage: text("blog_image").notNull(),
-  readTime: integer("read_time").notNull(),
-  likes: uuid("likes").references(() => likeTable.id).notNull(),
-  comments: uuid("comments").references(() => commentTable.id).notNull(),
-  blogtype: varchar("blog_type", { length: 255 }).notNull(),
+  readTime: integer("read_time"),
+  likes: integer("likes").default(0),
+  comments: integer("comments").default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const commentTable = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => usersTable.id).notNull(),
+  userId: uuid("user_id").references(() => usersTable.id, { onDelete: "cascade" }).notNull(),
+  blogId: uuid("blog_id").references(() => blogsTable.id, { onDelete: "cascade" }).notNull(),
   comment: text("comment").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -67,9 +68,43 @@ export const commentTable = pgTable("comments", {
 export const likeTable = pgTable("likes", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
+  blogId: uuid("blog_id").references(() => blogsTable.id, { onDelete: "cascade" }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  likes: many(likeTable),
+  comments: many(commentTable),
+}));
+
+export const blogsRelations = relations(blogsTable, ({ many }) => ({
+  likes: many(likeTable),
+  comments: many(commentTable),
+}));
+
+export const likesRelations = relations(likeTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [likeTable.userId],
+    references: [usersTable.id],
+  }),
+  blog: one(blogsTable, {
+    fields: [likeTable.blogId],
+    references: [blogsTable.id],
+  }),
+}));
+
+
+export const commentsRelations = relations(commentTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [commentTable.userId],
+    references: [usersTable.id],
+  }),
+  blog: one(blogsTable, {
+    fields: [commentTable.blogId],
+    references: [blogsTable.id],
+  }),
+}));
 
 export const ratingTable = pgTable("rating", {
   id: uuid("id").primaryKey().defaultRandom(),

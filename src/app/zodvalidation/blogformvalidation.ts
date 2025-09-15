@@ -11,7 +11,9 @@ export const blogValidationSchema = z.object({
     blogImage: z.string({
         message: "Please Enter Blog Image"
     }),
-    blogtype: z.string(),
+    category: z.string().min(2, {
+        message: "Please Enter Category"
+    }),
 });
 
 
