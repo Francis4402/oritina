@@ -11,11 +11,8 @@ import { blog } from "@/app/types/Types"
 import { format, parseISO } from 'date-fns'
 import { LikeButton } from "@/components/LikeButton"
 
-interface BlogPageProps {
-  blogs: blog[]
-}
 
-const BlogPage = ({ blogs }: BlogPageProps) => {
+const BlogPage = ({ blogs }: {blogs: blog[]}) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -174,7 +171,6 @@ const BlogPage = ({ blogs }: BlogPageProps) => {
                   <div className="flex items-center gap-2">
                       <LikeButton 
                         blogId={post.id!} 
-                        
                       />
                     <Button variant="ghost" size="sm" className="h-8 gap-1">
                       <MessageCircle className="h-4 w-4" />

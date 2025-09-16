@@ -11,26 +11,40 @@ interface LikeButtonProps {
 }
 
 export function LikeButton({ blogId}: LikeButtonProps) {
-  const [userLiked, setUserLiked] = useState<any[]>([]);
+  const [likes, setLikes] = useState<any[]>([]);
+  const [isLiked, setIsLiked] = useState(false)
+
+  const fetchLikes = async () => {
+    try {
+      const likesData = await getLikes();
+      setLikes(likesData);
+      
+    } catch (error) {
+      console.error('Failed to fetch likes:', error);
+    }
+  };
 
   const handleLike = async () => {
     try {
       const data = await postLike(blogId);
       
       const liked = Boolean(data.liked);
+
+      setIsLiked(liked);
+
+      await fetchLikes();
            
       toast.success(liked ? "Liked!" : "Like removed");
       
     } catch (error) {      
       console.log(error);
+      toast.error("Failed to update like");
     }
   }
 
   useEffect(() => {
-    getLikes().then((data) => {
-      setUserLiked(data);
-    });
-  }, []);
+    fetchLikes();
+  }, [blogId]);
 
 
   return (
@@ -39,8 +53,8 @@ export function LikeButton({ blogId}: LikeButtonProps) {
       size="sm"
       onClick={handleLike}
     >
-      <Heart className={`h-4 w-4`} />
-      <span>{userLiked?.length > 0 ? userLiked.length : 0}</span>
+      <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+      <span>{likes.length}</span>
     </Button>
   )
 }

@@ -49,9 +49,6 @@ export const blogsTable = pgTable("blogs", {
   description: text("description").notNull(),
   category: varchar({ length: 255 }).notNull(),
   blogImage: text("blog_image").notNull(),
-  readTime: integer("read_time"),
-  likes: integer("likes").default(0),
-  comments: integer("comments").default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -73,38 +70,15 @@ export const likeTable = pgTable("likes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const usersRelations = relations(usersTable, ({ many }) => ({
-  likes: many(likeTable),
-  comments: many(commentTable),
-}));
+export const readTime = pgTable("read_time", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  blogId: uuid("blog_id").references(() => blogsTable.id, { onDelete: "cascade" }).notNull(),
+  userId: uuid("user_id").references(() => usersTable.id).notNull(),
+  readTime: integer("read_time").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+})
 
-export const blogsRelations = relations(blogsTable, ({ many }) => ({
-  likes: many(likeTable),
-  comments: many(commentTable),
-}));
-
-export const likesRelations = relations(likeTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [likeTable.userId],
-    references: [usersTable.id],
-  }),
-  blog: one(blogsTable, {
-    fields: [likeTable.blogId],
-    references: [blogsTable.id],
-  }),
-}));
-
-
-export const commentsRelations = relations(commentTable, ({ one }) => ({
-  user: one(usersTable, {
-    fields: [commentTable.userId],
-    references: [usersTable.id],
-  }),
-  blog: one(blogsTable, {
-    fields: [commentTable.blogId],
-    references: [blogsTable.id],
-  }),
-}));
 
 export const ratingTable = pgTable("rating", {
   id: uuid("id").primaryKey().defaultRandom(),

@@ -6,30 +6,32 @@ import { revalidateTag } from "next/cache";
 
 
 const baseUrl = process.env.BASE_URL;
-export const postLike = async (id: string) => {
+export const postLike = async (blogId: string) => {
     try {
         const session = await getServerSession(authOptions);
-
-        const res = await fetch(`${baseUrl}/like/${id}`, {
-            method: 'PUT',
+        
+        const res = await fetch(`${baseUrl}/like/${blogId}`, {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${session?.accessToken}`
             },
+            body: JSON.stringify({ blogId }),
             cache: 'no-store',
         });
-
+        
         const data = await res.json();
-
+        
         if (!res.ok) {
-            throw new Error(data.error || 'Failed to create post');
+            throw new Error(data.error || 'Failed to update like');
         }
-
+        
         revalidateTag('like');
-
+        
         return data;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 }
 

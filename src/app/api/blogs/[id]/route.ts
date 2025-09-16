@@ -39,7 +39,6 @@ export async function PUT(req: NextRequest) {
             description: body.description,
             blogImage: body.blogImage,
             category: body.category,
-            readTime: body.readTime,
             updatedAt: new Date()
         }).where(eq(blogsTable.id, id));
 
