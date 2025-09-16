@@ -3,7 +3,7 @@
 import { Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { getLikes, postLike } from '@/services/Like'
+import { getLikesById, postLike } from '@/services/Like'
 import { useEffect, useState } from 'react'
 
 interface LikeButtonProps {
@@ -12,11 +12,10 @@ interface LikeButtonProps {
 
 export function LikeButton({ blogId}: LikeButtonProps) {
   const [likes, setLikes] = useState<any[]>([]);
-  const [isLiked, setIsLiked] = useState(false)
 
   const fetchLikes = async () => {
     try {
-      const likesData = await getLikes();
+      const likesData = await getLikesById(blogId);
       setLikes(likesData);
       
     } catch (error) {
@@ -29,8 +28,6 @@ export function LikeButton({ blogId}: LikeButtonProps) {
       const data = await postLike(blogId);
       
       const liked = Boolean(data.liked);
-
-      setIsLiked(liked);
 
       await fetchLikes();
            
@@ -53,7 +50,7 @@ export function LikeButton({ blogId}: LikeButtonProps) {
       size="sm"
       onClick={handleLike}
     >
-      <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+      <Heart className={`h-4 w-4`} />
       <span>{likes.length}</span>
     </Button>
   )

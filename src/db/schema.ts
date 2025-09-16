@@ -66,6 +66,7 @@ export const likeTable = pgTable("likes", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
   blogId: uuid("blog_id").references(() => blogsTable.id, { onDelete: "cascade" }).notNull(),
+  liked: boolean("liked").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

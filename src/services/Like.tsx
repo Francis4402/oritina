@@ -36,12 +36,12 @@ export const postLike = async (blogId: string) => {
 }
 
 
-export const getLikes = async () => {
+export const getLikesById = async (id: string) => {
     try {
-        const res = await fetch(`${baseUrl}/like`, {
+        const res = await fetch(`${baseUrl}/like/${id}`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',                
+                'Content-Type': 'application/json',
             },
             cache: 'no-store',
             next: { tags: ['like'] }
@@ -52,7 +52,7 @@ export const getLikes = async () => {
         }
 
         const data = await res.json();
-        return data.likes;
+        return data.data;
     } catch (error) {
         console.log(error);
     }
