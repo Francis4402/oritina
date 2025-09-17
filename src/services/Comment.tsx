@@ -8,6 +8,30 @@ import { revalidateTag } from "next/cache";
 
 const baseUrl = process.env.BASE_URL;
 
+
+export const getAllComments = async () => {
+    try {
+        const res = await fetch(`${baseUrl}/comment`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store',
+            next: {
+                tags: ['comment']
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const postcomment = async (data: { comment: string; blogId: string }) => {
     try {
         const session = await getServerSession(authOptions);

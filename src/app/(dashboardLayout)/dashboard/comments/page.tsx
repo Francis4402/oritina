@@ -1,19 +1,16 @@
 import React from 'react'
 import CommentTable from './CommentTable';
-import { getComments } from '@/services/Comment';
-import { getBlogs } from '@/services/Blog';
+import { getAllComments } from '@/services/Comment';
+
 
 
 const Comments = async () => {
-  const blogs = await getBlogs();
 
-  const blogId = blogs.id;
-
-  const comments = await getComments(blogId);
+  const comments = await getAllComments();
 
   return (
     <div>
-      
+      <CommentTable comment={comments} />
     </div>
   )
 }
