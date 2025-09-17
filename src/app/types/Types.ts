@@ -1,4 +1,21 @@
+import { User } from "./authtype";
 
+export interface liked {
+    id?: string;
+    userId: User;
+    blogId: string;
+    liked: boolean;
+    createdAt?: string;
+}
+
+export interface commenttype {
+    id?: string;
+    user: User;
+    blogId: string;
+    comment: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
 
 export interface product {
     id?: string;
@@ -38,22 +55,6 @@ export interface category {
     updatedAt?: string;
 }
 
-export interface comment {
-    id?: string;
-    blogId: string;
-    userId: string;
-    comment: string;
-    createdAt?: string;
-    updatedAt?: string;
-}
-
-export interface like {
-    id?: string;
-    blogId: string;
-    userId: string;
-    createdAt?: string;
-    updatedAt?: string;
-}
 
 export interface rating {
     id?: string;

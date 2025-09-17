@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { blog } from "@/app/types/Types"
 import { format, parseISO } from 'date-fns'
 import { LikeButton } from "@/components/LikeButton"
+import CommentButton from "@/components/CommentButton"
 
 
 const BlogPage = ({ blogs }: {blogs: blog[]}) => {
@@ -172,14 +173,8 @@ const BlogPage = ({ blogs }: {blogs: blog[]}) => {
                       <LikeButton 
                         blogId={post.id!} 
                       />
-                    <Button variant="ghost" size="sm" className="h-8 gap-1">
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{post.comments || "0"}</span>
-                    </Button>
+                    <CommentButton blogId={post.id!} />
                   </div>
-                  <Button variant="ghost" size="sm" className="h-8">
-                    <Share className="h-4 w-4" />
-                  </Button>
                 </CardFooter>
               </Card>
             ))}

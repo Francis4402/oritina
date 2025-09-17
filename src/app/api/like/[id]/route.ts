@@ -7,73 +7,72 @@ import { and, eq } from "drizzle-orm";
 
 
 export async function PATCH(req: NextRequest) {
-    try {
-        const authHeader = req.headers.get("authorization");
+  try {
+    const authHeader = req.headers.get("authorization");
 
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-    
-        const token = authHeader.split(" ")[1];
-
-        let decoded;
-        try {
-          decoded = jwt.verify(token, process.env.AUTH_SECRET as string);
-        } catch {
-          return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-        }
-
-
-        const userId = (decoded as any).id || (decoded as any).sub;
-        
-        const body = await req.json();
-        const blogId = body.blogId;
-
-        if (!blogId) {
-          return NextResponse.json({ error: "Blog ID is required" }, { status: 400 });
-        }
-
-
-        const existingLike = await db
-          .select()
-          .from(likeTable)
-          .where(and(eq(likeTable.userId, userId), eq(likeTable.blogId, blogId)));
-
-        if (existingLike.length > 0) {
-          
-          await db.delete(likeTable).where(and(eq(likeTable.userId, userId), eq(likeTable.blogId, blogId)));
-          
-          const likeCount = await db
-                .select()
-                .from(likeTable)
-                .where(eq(likeTable.blogId, blogId));
-
-          return NextResponse.json({ liked: false, likeCount: likeCount.length });
-        } else {
-          
-          await db.insert(likeTable).values({ 
-            userId: userId, 
-            blogId: blogId,
-           });
-
-          const likeCount = await db
-              .select()
-              .from(likeTable)
-              .where(eq(likeTable.blogId, blogId));
-
-          return NextResponse.json({ 
-              liked: true, 
-              likeCount: likeCount.length 
-          });
-        }
-        
-    } catch (error) {
-        console.error("Like error:", error);
-        return NextResponse.json(
-          { error: "Internal server error" },
-          { status: 500 }
-        );
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const token = authHeader.split(" ")[1];
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.AUTH_SECRET as string);
+    } catch {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const userId = (decoded as any).id || (decoded as any).sub;
+    
+    const body = await req.json();
+    const blogId = body.blogId;
+
+    if (!blogId) {
+      return NextResponse.json({ error: "Blog ID is required" }, { status: 400 });
+    }
+
+    const existingLike = await db
+      .select()
+      .from(likeTable)
+      .where(and(eq(likeTable.userId, userId), eq(likeTable.blogId, blogId)));
+
+    if (existingLike.length > 0) {
+      
+      await db.delete(likeTable).where(and(eq(likeTable.userId, userId), eq(likeTable.blogId, blogId)));
+      
+      const likeCount = await db
+        .select()
+        .from(likeTable)
+        .where(and(eq(likeTable.blogId, blogId), eq(likeTable.liked, true)));
+
+      return NextResponse.json({ liked: false, likeCount: likeCount.length });
+    } else {
+      
+      await db.insert(likeTable).values({ 
+        userId: userId, 
+        blogId: blogId,
+        liked: true
+      });
+
+      const likeCount = await db
+        .select()
+        .from(likeTable)
+        .where(and(eq(likeTable.blogId, blogId), eq(likeTable.liked, true)));
+
+      return NextResponse.json({ 
+        liked: true, 
+        likeCount: likeCount.length 
+      });
+    }
+    
+  } catch (error) {
+    console.error("Like error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function GET(req: NextRequest) {

@@ -6,11 +6,12 @@ import { toast } from 'sonner'
 import { getLikesById, postLike } from '@/services/Like'
 import { useEffect, useState } from 'react'
 
+
 interface LikeButtonProps {
   blogId: string
 }
 
-export function LikeButton({ blogId}: LikeButtonProps) {
+export function LikeButton({ blogId }: LikeButtonProps) {
   const [likes, setLikes] = useState<any[]>([]);
 
   const fetchLikes = async () => {
@@ -22,6 +23,10 @@ export function LikeButton({ blogId}: LikeButtonProps) {
       console.error('Failed to fetch likes:', error);
     }
   };
+
+  const like = likes.find(like => like.blogId === blogId && like.liked === true);
+  
+  const isLiked = Boolean(like);
 
   const handleLike = async () => {
     try {
@@ -50,7 +55,7 @@ export function LikeButton({ blogId}: LikeButtonProps) {
       size="sm"
       onClick={handleLike}
     >
-      <Heart className={`h-4 w-4`} />
+      <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
       <span>{likes.length}</span>
     </Button>
   )

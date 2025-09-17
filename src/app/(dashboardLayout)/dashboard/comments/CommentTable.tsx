@@ -1,14 +1,14 @@
 "use client"
 
 
-import { comment } from '@/app/types/Types'
+import { commenttype } from '@/app/types/Types'
 import { MainTable } from '@/app/utils/Table'
 import { ColumnDef } from '@tanstack/react-table'
 
 
-const CommentTable = ({comment}: {comment: comment[]}) => {
+const CommentTable = ({comment}: {comment: commenttype[]}) => {
 
-    const columns: ColumnDef<comment>[] = [
+    const columns: ColumnDef<commenttype>[] = [
         {
             accessorKey: 'comment',
             header: 'Comment',
