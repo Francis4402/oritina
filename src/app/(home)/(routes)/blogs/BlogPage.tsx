@@ -11,6 +11,7 @@ import { blog } from "@/app/types/Types"
 import { format, parseISO } from 'date-fns'
 import { LikeButton } from "@/components/LikeButton"
 import CommentButton from "@/components/CommentButton"
+import Link from "next/link"
 
 
 const BlogPage = ({ blogs }: {blogs: blog[]}) => {
@@ -120,9 +121,11 @@ const BlogPage = ({ blogs }: {blogs: blog[]}) => {
                   )}
                 </div>
                 
-                <Button className="w-fit">
-                  Read Article <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href={`/blogs/${featuredPost.id}`}>
+                  <Button className="w-fit">
+                    Read Article <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </Card>
@@ -137,24 +140,26 @@ const BlogPage = ({ blogs }: {blogs: blog[]}) => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {filteredPosts.map((post) => (
               <Card key={post.id} className="overflow-hidden h-full flex flex-col transition-all hover:shadow-xl">
-                <div className="relative h-48">
-                  <Image
-                    src={post.blogImage}
-                    alt={post.title}
-                    fill
-                    className="object-cover"
-                  />
-                  <Badge variant="secondary" className="absolute top-3 left-3 capitalize">
-                    {post.category}
-                  </Badge>
-                </div>
-                
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-xl line-clamp-2">{post.title}</CardTitle>
-                  <CardDescription className="line-clamp-3">
-                    {post.description}
-                  </CardDescription>
-                </CardHeader>
+                <Link href={`/blogs/${post.id}`}>
+                    <div className="relative h-48">
+                    <Image
+                      src={post.blogImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover"
+                    />
+                    <Badge variant="secondary" className="absolute top-3 left-3 capitalize">
+                      {post.category}
+                    </Badge>
+                  </div>
+                  
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-xl line-clamp-2">{post.title}</CardTitle>
+                    <CardDescription className="line-clamp-3">
+                      {post.description}
+                    </CardDescription>
+                  </CardHeader>
+                </Link>
                 
                 <CardContent className="pb-3">
                   <div className="flex items-center justify-between text-sm text-muted-foreground">

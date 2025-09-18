@@ -25,6 +25,25 @@ export const getBlogs = async () => {
     }
 }
 
+export const getBlogsbyId = async (id: string) => {
+    try {
+        const res = await fetch(`${baseurl}/blogs/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            cache: 'no-store',
+            next: {
+                tags: ['blogs']
+            }
+        });
+
+        return res.json();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 export const createBlog = async (blog: blog) => {
     try {
