@@ -1,6 +1,7 @@
 'use client';
 
-import { product } from '@/app/types/Types';
+import { product, productCommentType } from '@/app/types/Types';
+import CommentRatingUtils from '@/components/CommentRatingUtils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,7 @@ import React, { useState } from 'react';
 import { FaHeart, FaShare, FaShoppingBag, FaStar, FaRegStar, FaChevronRight } from 'react-icons/fa';
 import { toast } from 'sonner';
 
-export const ProductDetails = ({ productData, relatedProducts }: { productData: product, relatedProducts: product[] }) => {
+export const ProductDetails = ({ productData, relatedProducts, commentList, id }: { productData: product, relatedProducts: product[], commentList: productCommentType[], id: string }) => {
     const [selectedImage, setSelectedImage] = useState(productData.productImage[0]);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -73,23 +74,6 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
         { size: '2XL', chest: 45, length: 30, sleeve: 9.25 },
     ];
 
-    // Sample reviews data
-    const reviews = [
-        {
-            id: 1,
-            user: "John Doe",
-            rating: "4",
-            comment: "Great product! The quality exceeded my expectations.",
-            date: "2023-10-15"
-        },
-        {
-            id: 2,
-            user: "Jane Smith",
-            rating: "5",
-            comment: "Absolutely love it! Would definitely buy again.",
-            date: "2023-09-28"
-        }
-    ];
 
     return (
         <div className="container mx-auto px-4 py-8 poppins max-w-6xl">
@@ -353,44 +337,7 @@ export const ProductDetails = ({ productData, relatedProducts }: { productData: 
                     <TabsContent value="reviews">
                         <Card>
                             <CardContent className="p-6">
-                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                                    <div>
-                                        <h3 className="text-xl font-semibold">Customer Reviews</h3>
-                                        <div className="flex items-center gap-2 mt-2">
-                                            <div className="flex">
-                                                {renderRating(productData.totalRating)}
-                                            </div>
-                                            <span className="text-muted-foreground">
-                                                Based on {productData.reviews || 0} reviews
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <Button className="mt-4 md:mt-0">Write a Review</Button>
-                                </div>
-                                
-                                <div className="space-y-6">
-                                    {reviews.map((review) => (
-                                        <div key={review.id} className="border-b pb-6 last:border-0 last:pb-0">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <h4 className="font-semibold">{review.user}</h4>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {new Date(review.date).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                            <div className="flex mb-3">
-                                                {renderRating(review.rating)}
-                                            </div>
-                                            <p className="text-muted-foreground">{review.comment}</p>
-                                        </div>
-                                    ))}
-                                    
-                                    {reviews.length === 0 && (
-                                        <div className="text-center py-8">
-                                            <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
-                                            <Button className="mt-4">Write a Review</Button>
-                                        </div>
-                                    )}
-                                </div>
+                                <CommentRatingUtils commentList={commentList} productId={id} />
                             </CardContent>
                         </Card>
                     </TabsContent>

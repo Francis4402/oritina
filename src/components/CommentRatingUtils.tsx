@@ -6,17 +6,21 @@ import { Button } from './ui/button'
 import { Edit, Send, Star } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { commenttype } from '@/app/types/Types'
+import { productCommentType } from '@/app/types/Types'
 import { format, formatDistanceToNow } from 'date-fns'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { CommentValid, commentValidation } from '@/app/zodvalidation/commentValidation'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { deleteComment, postcomment } from '@/services/Comment'
 import { toast } from 'sonner'
 import { Form, FormControl, FormField, FormItem } from './ui/form'
 import { Textarea } from './ui/textarea'
+import { deleteProductComment, postproductComment } from '@/services/ProductComments'
+import { useState } from 'react'
+import { postRating } from '@/services/Rating'
 
-const CommentRatingUtils = ({commentList, blogId}: {commentList: commenttype[], blogId: string}) => {
+
+const CommentRatingUtils = ({commentList, productId}: {commentList: productCommentType[], productId: string}) => {
+    
 
     const form = useForm<CommentValid>({
         resolver: zodResolver(commentValidation),
@@ -27,9 +31,26 @@ const CommentRatingUtils = ({commentList, blogId}: {commentList: commenttype[], 
 
     const {formState: {isSubmitting}, reset} = form;
 
+    const handleRating = async (rating: number) => {
+        try {
+            const res = await postRating({
+                productId,
+                ratings: rating
+            });
+
+            if(res.success) {
+                toast.success("You Rated The Product")
+            } else {
+                toast.error("rating failed")
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     const handleDelete = async (id: string) => {
         try {
-            const res = await deleteComment(id);
+            const res = await deleteProductComment(id);
 
             if(res.success) {
                 toast.success("comment deleted");
@@ -41,11 +62,12 @@ const CommentRatingUtils = ({commentList, blogId}: {commentList: commenttype[], 
         }
     }
 
+
     const onSubmit: SubmitHandler<CommentValid> = async (data) => {
         try {
-            const res = await postcomment({
+            const res = await postproductComment({
                 ...data,
-                blogId
+                productId
             });
 
             if (res) {
@@ -79,7 +101,7 @@ const CommentRatingUtils = ({commentList, blogId}: {commentList: commenttype[], 
         } catch (error) {
             return format(new Date(), 'MMM d, yyyy');
         }
-      }
+    }
 
   return (
     <div className="max-w-7xl mx-auto px-4 mt-12">
@@ -135,7 +157,7 @@ const CommentRatingUtils = ({commentList, blogId}: {commentList: commenttype[], 
                 
                 {/* Comment 1 */}
                 {
-                    commentList.map((comments: commenttype) => (
+                    commentList.map((comments: productCommentType) => (
                     <div key={comments.id} className="p-6 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
                         <div className='flex justify-between items-start'>
                         <div className="flex items-start gap-4">

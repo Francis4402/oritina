@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'
-import { CalendarDays, Search, MessageCircle, Share, ArrowRight } from 'lucide-react'
+import { CalendarDays, Search, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { blog } from "@/app/types/Types"
 import { format, parseISO } from 'date-fns'

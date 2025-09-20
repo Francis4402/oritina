@@ -62,6 +62,15 @@ export const commentTable = pgTable("comments", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const productCommentTable = pgTable("productComment", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => usersTable.id, {onDelete: "cascade"}).notNull(),
+  productId: uuid("product_id").references(() => productsTable.id, {onDelete: "cascade"}).notNull(),
+  comment: text("comment").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 export const likeTable = pgTable("likes", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
@@ -71,21 +80,29 @@ export const likeTable = pgTable("likes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const readTime = pgTable("read_time", {
+export const blogReadTable = pgTable("blog_read_time", {
   id: uuid("id").primaryKey().defaultRandom(),
   blogId: uuid("blog_id").references(() => blogsTable.id, { onDelete: "cascade" }).notNull(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
   readTime: integer("read_time").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-})
+});
 
+export const productReadTable = pgTable("product_read_time", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => usersTable.id).notNull(),
+  productId: uuid("product_id").references(() => productsTable.id, {onDelete: "cascade"}).notNull(),
+  readTime: integer("read_time").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
 export const ratingTable = pgTable("rating", {
   id: uuid("id").primaryKey().defaultRandom(),
   productId: uuid("product_id").references(() => productsTable.id).notNull(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
-  rating: varchar({ length: 255 }).notNull(),
+  rating: integer("rating").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

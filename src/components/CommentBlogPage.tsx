@@ -3,20 +3,20 @@
 
 import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
-import { Edit, Send, Star } from 'lucide-react'
+import { Edit, Send } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { commenttype } from '@/app/types/Types'
+import { blogCommentType } from '@/app/types/Types'
 import { format, formatDistanceToNow } from 'date-fns'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { CommentValid, commentValidation } from '@/app/zodvalidation/commentValidation'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { deleteComment, postcomment } from '@/services/Comment'
 import { toast } from 'sonner'
 import { Form, FormControl, FormField, FormItem } from './ui/form'
 import { Textarea } from './ui/textarea'
+import { deleteblogComment, postblogcomment } from '@/services/BlogComment'
 
-const CommentBlogPage = ({commentList, blogId}: {commentList: commenttype[], blogId: string}) => {
+const CommentBlogPage = ({commentList, blogId}: {commentList: blogCommentType[], blogId: string}) => {
 
     const form = useForm<CommentValid>({
         resolver: zodResolver(commentValidation),
@@ -29,7 +29,7 @@ const CommentBlogPage = ({commentList, blogId}: {commentList: commenttype[], blo
 
     const handleDelete = async (id: string) => {
         try {
-            const res = await deleteComment(id);
+            const res = await deleteblogComment(id);
 
             if(res.success) {
                 toast.success("comment deleted");
@@ -43,7 +43,7 @@ const CommentBlogPage = ({commentList, blogId}: {commentList: commenttype[], blo
 
     const onSubmit: SubmitHandler<CommentValid> = async (data) => {
         try {
-            const res = await postcomment({
+            const res = await postblogcomment({
                 ...data,
                 blogId
             });
@@ -91,18 +91,6 @@ const CommentBlogPage = ({commentList, blogId}: {commentList: commenttype[], blo
                 <div className="mb-8 p-6 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-xl border border-blue-100 dark:border-blue-800">
                 <h4 className="font-semibold mb-4 text-slate-900 dark:text-slate-100">Share Your Thoughts</h4>
                 
-                {/* Rating Stars */}
-                {/* <div className="mb-4">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Rate this article</label>
-                    <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <Star 
-                        key={star} 
-                        className="h-6 w-6 text-yellow-400 hover:text-yellow-500 cursor-pointer transition-colors fill-current" 
-                        />
-                    ))}
-                    </div>
-                </div> */}
 
                     {/* Comment Textarea */}
                     <Form {...form}>
@@ -135,7 +123,7 @@ const CommentBlogPage = ({commentList, blogId}: {commentList: commenttype[], blo
                 
                 {/* Comment 1 */}
                 {
-                    commentList.map((comments: commenttype) => (
+                    commentList.map((comments: blogCommentType) => (
                     <div key={comments.id} className="p-6 bg-white/50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
                         <div className='flex justify-between items-start'>
                         <div className="flex items-start gap-4">

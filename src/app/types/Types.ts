@@ -8,10 +8,19 @@ export interface liked {
     createdAt?: string;
 }
 
-export interface commenttype {
+export interface blogCommentType {
     id?: string;
     user: User;
     blogId: string;
+    comment: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface productCommentType {
+    id?: string;
+    user: User;
+    productId: string;
     comment: string;
     createdAt?: string;
     updatedAt?: string;

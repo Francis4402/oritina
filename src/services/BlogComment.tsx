@@ -9,7 +9,7 @@ import { revalidateTag } from "next/cache";
 const baseUrl = process.env.BASE_URL;
 
 
-export const getAllComments = async () => {
+export const getAllBlogComments = async () => {
     try {
         const res = await fetch(`${baseUrl}/comment`, {
             method: 'GET',
@@ -32,7 +32,7 @@ export const getAllComments = async () => {
     }
 }
 
-export const postcomment = async (data: { comment: string; blogId: string }) => {
+export const postblogcomment = async (data: { comment: string; blogId: string }) => {
     try {
         const session = await getServerSession(authOptions);
 
@@ -58,7 +58,7 @@ export const postcomment = async (data: { comment: string; blogId: string }) => 
     }
 }
 
-export const getComments = async (id: string) => {
+export const getblogComments = async (id: string) => {
     try {
         const res = await fetch(`${baseUrl}/comment/${id}`, {
             method: 'GET',
@@ -83,7 +83,7 @@ export const getComments = async (id: string) => {
     }
 }
 
-export const deleteComment = async (id: string) => {
+export const deleteblogComment = async (id: string) => {
     try {
         
         const res = await fetch(`${baseUrl}/comment/${id}`, {

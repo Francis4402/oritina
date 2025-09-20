@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getComments } from '@/services/Comment'
+
 import CommentBlogPage from '@/components/CommentBlogPage'
+import { getblogComments } from '@/services/BlogComment'
 
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -26,7 +27,7 @@ const BlogsDetails = async ({ params }: { params: Promise<{ id: string }> }) => 
   const blog = await getBlogsbyId(id)
   const blogData = blog.data[0]
 
-  const commentList = await getComments(id);
+  const commentList = await getblogComments(id);
   
   
   const formatDate = (dateString?: string) => {

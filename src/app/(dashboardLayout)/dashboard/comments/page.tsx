@@ -1,12 +1,12 @@
 import React from 'react'
 import CommentTable from './CommentTable';
-import { getAllComments } from '@/services/Comment';
+import { getAllBlogComments } from '@/services/BlogComment';
 
 
 
 const Comments = async () => {
 
-  const comments = await getAllComments();
+  const comments = await getAllBlogComments();
 
   return (
     <div>

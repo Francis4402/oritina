@@ -1,24 +1,14 @@
 import { db } from "@/db/db";
 import { ratingTable } from "@/db/schema";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-
-
-export async function POST(req: NextRequest) {
+export async function GET() {
     try {
-        const body = await req.json();
-        
-        const newRating = await db.insert(ratingTable).values({
-            productId: body.productId,
-            userId: body.userId,
-            rating: body.rating,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
+        const rating =  db.select().from(ratingTable);
 
-        return NextResponse.json(newRating, {status: 201});
+        return NextResponse.json(rating);
     } catch (error) {
         console.log(error);
-        return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch rating' }, { status: 500 });
     }
 }
