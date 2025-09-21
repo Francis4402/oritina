@@ -45,9 +45,7 @@ export async function PUT(req: NextRequest) {
             size: body.size,
             spcefication: body.spcefication,
             color: body.color,
-            totalRating: body.totalRating || "0",
             quantity: body.quantity,
-            reviews: body.reviews || "0",
         }).where(eq(productsTable.id, id));
 
         return NextResponse.json({success: true, updated});

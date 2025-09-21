@@ -15,12 +15,16 @@ import { toast } from 'sonner'
 import { Form, FormControl, FormField, FormItem } from './ui/form'
 import { Textarea } from './ui/textarea'
 import { deleteProductComment, postproductComment } from '@/services/ProductComments'
-import { useState } from 'react'
 import { postRating } from '@/services/Rating'
+import { useState } from 'react'
 
 
 const CommentRatingUtils = ({commentList, productId}: {commentList: productCommentType[], productId: string}) => {
     
+    const [userRating, setUserRating] = useState<number>(0)
+    const [hoverRating, setHoverRating] = useState<number>(0)
+    const [isRating, setIsRating] = useState(false)
+
 
     const form = useForm<CommentValid>({
         resolver: zodResolver(commentValidation),
@@ -32,19 +36,26 @@ const CommentRatingUtils = ({commentList, productId}: {commentList: productComme
     const {formState: {isSubmitting}, reset} = form;
 
     const handleRating = async (rating: number) => {
+        if (isRating) return;
+        
+        setIsRating(true)
         try {
             const res = await postRating({
                 productId,
                 ratings: rating
             });
 
-            if(res.success) {
-                toast.success("You Rated The Product")
+            if(res) {
+                setUserRating(rating)
+                toast.success("Rating submitted successfully!")
             } else {
-                toast.error("rating failed")
+                toast.error("Failed to submit rating")
             }
         } catch (error) {
             console.log(error);
+            toast.error("Failed to submit rating")
+        } finally {
+            setIsRating(false)
         }
     }
 
@@ -115,15 +126,32 @@ const CommentRatingUtils = ({commentList, productId}: {commentList: productComme
                 
                 {/* Rating Stars */}
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Rate this article</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Rate this Product</label>
                     <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <Star 
-                        key={star} 
-                        className="h-6 w-6 text-yellow-400 hover:text-yellow-500 cursor-pointer transition-colors fill-current" 
-                        />
-                    ))}
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                                key={star} 
+                                className={`h-6 w-6 cursor-pointer transition-colors duration-150 hover:text-yellow-500 hover:scale-110 ${
+                                    star <= (hoverRating || userRating) 
+                                        ? 'text-yellow-400 fill-current' 
+                                        : 'text-slate-300 dark:text-slate-600'
+                                } ${isRating ? 'opacity-50' : ''}`}
+                                onMouseEnter={() => !isRating && setHoverRating(star)}
+                                onMouseLeave={() => !isRating && setHoverRating(0)}
+                                onClick={() => !isRating && handleRating(star)}
+                            />
+                        ))}
                     </div>
+                    {userRating > 0 && (
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                            You rated this {userRating} star{userRating > 1 ? 's' : ''}
+                        </p>
+                    )}
+                    {isRating && (
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                            Submitting rating...
+                        </p>
+                    )}
                 </div>
 
                     {/* Comment Textarea */}
@@ -171,12 +199,12 @@ const CommentRatingUtils = ({commentList, productId}: {commentList: productComme
                             <div className="flex items-center gap-3 mb-2">
                                 <h5 className="font-medium text-slate-900 dark:text-slate-100">{comments.user.name}</h5>
                                 <div className="flex gap-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star 
-                                    key={star} 
-                                    className={`h-4 w-4 ${star <= 5 ? 'text-yellow-400 fill-current' : 'text-slate-300 dark:text-slate-600'}`} 
-                                    />
-                                ))}
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star 
+                                        key={star} 
+                                        className={`h-4 w-4 ${star <= 5 ? 'text-yellow-400 fill-current' : 'text-slate-300 dark:text-slate-600'}`} 
+                                        />
+                                    ))}
                                 </div>
                                 <span className="text-xs text-slate-500 dark:text-slate-400">{formatDate(comments.createdAt!)}</span>
 

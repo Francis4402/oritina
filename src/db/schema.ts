@@ -27,8 +27,7 @@ export const productsTable = pgTable("products", {
   spcefication: varchar({ length: 255 }).array().notNull(),
   category: varchar({ length: 255 }).notNull(),
   producttype: varchar({ length: 255 }).notNull(),
-  totalRating: varchar({ length: 255 }),
-  reviews: varchar({ length: 255 }),
+  readTime: integer("read_time"),
   quantity: integer("quantity").notNull(),
   size: varchar({ length: 255 }).array().notNull(),
   isFavorite: boolean("is_favorite").notNull().default(false),
@@ -49,6 +48,7 @@ export const blogsTable = pgTable("blogs", {
   description: text("description").notNull(),
   category: varchar({ length: 255 }).notNull(),
   blogImage: text("blog_image").notNull(),
+  readTime: integer("read_time"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -80,27 +80,9 @@ export const likeTable = pgTable("likes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const blogReadTable = pgTable("blog_read_time", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  blogId: uuid("blog_id").references(() => blogsTable.id, { onDelete: "cascade" }).notNull(),
-  userId: uuid("user_id").references(() => usersTable.id).notNull(),
-  readTime: integer("read_time").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
-export const productReadTable = pgTable("product_read_time", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => usersTable.id).notNull(),
-  productId: uuid("product_id").references(() => productsTable.id, {onDelete: "cascade"}).notNull(),
-  readTime: integer("read_time").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
 export const ratingTable = pgTable("rating", {
   id: uuid("id").primaryKey().defaultRandom(),
-  productId: uuid("product_id").references(() => productsTable.id).notNull(),
+  productId: uuid("product_id").references(() => productsTable.id, {onDelete: "cascade"}).notNull(),
   userId: uuid("user_id").references(() => usersTable.id).notNull(),
   rating: integer("rating").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

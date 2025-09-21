@@ -11,7 +11,7 @@ import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Star, Filter, Grid3X3, List } from 'lucide-react'
 import Image from 'next/image'
-import { product } from '@/app/types/Types'
+import { product, ProductRating } from '@/app/types/Types'
 import Link from 'next/link'
 import { FaRegStar, FaStar } from 'react-icons/fa'
 import { IMeta } from '@/app/types/meta'
@@ -26,18 +26,22 @@ import {
 } from "@/components/ui/pagination"
 import { useCartStore } from '@/lib/store'
 import { toast } from 'sonner'
+import { fetchRatings } from '@/services/Rating'
 
 const ShopPage = ({ products, pagination }: { products: product[], pagination: IMeta }) => {
   
-  // Track selected size and color for each product individually
+
   const [selectedOptions, setSelectedOptions] = useState<Record<string, { size: string | null; color: string | null }>>({});
+  const [productRatings, setProductRatings] = useState<Record<string, ProductRating>>({});
+  const [ratingsLoading, setRatingsLoading] = useState<Record<string, boolean>>({});
   
+
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const { addToCart } = useCartStore();
 
-  // Initialize selected options for each product
+  
   useEffect(() => {
     const initialOptions: Record<string, { size: string | null; color: string | null }> = {};
     products.forEach(product => {
@@ -49,12 +53,72 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
     setSelectedOptions(initialOptions);
   }, [products]);
 
+
+useEffect(() => {
+  const loadAllRatings = async () => {
+    if (!products.length) return;
+
+    // Set loading state for all products
+    const loadingStates: Record<string, boolean> = {};
+    products.forEach(product => {
+      const productId = product.id || '';
+      if (productId) loadingStates[productId] = true;
+    });
+    setRatingsLoading(loadingStates);
+
+    try {
+      // Fetch all ratings in parallel
+      const results = await Promise.all(
+        products.map(async (product) => {
+          const productId = product.id || '';
+          if (!productId) return null;
+
+          try {
+            const data = await fetchRatings(productId);
+            return {
+              productId,
+              averageRating: data.averageRating,
+              totalRatings: data.totalRatings,
+            } as ProductRating;
+          } catch (err) {
+            console.error(`Error fetching ratings for ${productId}:`, err);
+            return {
+              productId,
+              averageRating: 0,
+              totalRatings: 0,
+            } as ProductRating;
+          }
+        })
+      );
+
+      // Build final ratings map
+      const ratingsMap: Record<string, ProductRating> = {};
+      results.forEach((res) => {
+        if (res) ratingsMap[res.productId] = res;
+      });
+
+      setProductRatings(ratingsMap);
+    } finally {
+      // Mark all products as not loading
+      const doneLoading: Record<string, boolean> = {};
+      products.forEach(product => {
+        const productId = product.id || '';
+        if (productId) doneLoading[productId] = false;
+      });
+      setRatingsLoading(doneLoading);
+    }
+  };
+
+  loadAllRatings();
+}, [products]);
+
+
   const handleSizeSelect = (productId: string, size: string) => {
     setSelectedOptions(prev => ({
       ...prev,
       [productId]: {
         ...prev[productId],
-        size: prev[productId]?.size === size ? null : size // Toggle selection
+        size: prev[productId]?.size === size ? null : size
       }
     }));
   };
@@ -64,7 +128,7 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
       ...prev,
       [productId]: {
         ...prev[productId],
-        color: prev[productId]?.color === color ? null : color // Toggle selection
+        color: prev[productId]?.color === color ? null : color
       }
     }));
   };
@@ -92,7 +156,6 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
         productImage: product.productImage,
         description: product.description,
         category: product.category,
-        totalRating: product.totalRating,
         quantity: 1,
         selectedColor: selectedColor || undefined,
         selectedSize: selectedSize || undefined,
@@ -112,10 +175,10 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
   ])
 
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("producttype") || 'all')
-  const [sortOption, setSortOption] = useState(searchParams.get("sort") || 'id')
+  const [sortOption, setSortOption] = useState(searchParams.get("sort") || 'featured')
 
   const [viewMode, setViewMode] = useState(searchParams.get("view") || 'grid')
-  const [minRating, setMinRating] = useState(Number(searchParams.get("totalRating")) || 0)
+  const [minRating, setMinRating] = useState(Number(searchParams.get("minRating")) || 0)
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1)
 
   
@@ -141,7 +204,7 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
     if (sort !== "id") params.set("sort", sort)
     if (order !== "asc") params.set("order", order)
     if (viewMode !== "grid") params.set("view", viewMode)
-    if (minRating > 0) params.set("totalRating", String(minRating))
+    if (minRating > 0) params.set("rating", String(minRating))
     if (page > 1) params.set("page", String(page))
 
     router.replace(`?${params.toString()}`)
@@ -252,16 +315,27 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
     )
   }
 
-  const renderRating = (rating: string = "0") => {
-    const numericRating = parseFloat(rating)
+  const renderRating = (productId: string) => {
+    const rating = productRatings[productId]?.averageRating || 0;
+    const isLoading = ratingsLoading[productId];
+    
+    if (isLoading) {
+      return Array.from({ length: 5 }, (_, i) => (
+        <FaRegStar key={i} className="text-gray-300 inline animate-pulse" size={16} />
+      ));
+    }
+    
     return Array.from({ length: 5 }, (_, i) =>
-      i + 1 <= numericRating ? (
+      i + 1 <= rating ? (
         <FaStar key={i} className="text-yellow-400 inline" size={16} />
       ) : (
         <FaRegStar key={i} className="text-gray-300 inline" size={16} />
       )
-    )
-  }
+    );
+  };
+
+  
+  const filteredProducts = products;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -360,6 +434,7 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
                 Showing {((pagination.page - 1) * pagination.Size) + 1} to{' '}
                 {Math.min(pagination.page * pagination.Size, parseInt(pagination.total))} of{' '}
                 {pagination.total} products
+                {minRating > 0 && ` (Filtered by ${minRating}+ stars)`}
               </p>
             </div>
 
@@ -403,18 +478,26 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
           <div className={viewMode === 'grid'
             ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'
             : 'space-y-6 mb-8'}>
-            {products.map((product) => {
+            {filteredProducts.map((product) => {
               const productId = product.id || '';
               const selectedSize = selectedOptions[productId]?.size;
               const selectedColor = selectedOptions[productId]?.color;
+              const ratingInfo = productRatings[productId];
+              const isLoading = ratingsLoading[productId];
               
               return (
                 <Card key={productId} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <CardContent>
                     <div className={`relative ${viewMode === 'list' ? 'flex' : ''}`}>
-                      <div className={`bg-blue-100`}>
+                      <div className={`bg-blue-100 ${viewMode === 'list' ? 'w-1/3' : ''}`}>
                         <Link href={`/product/${productId}`}>
-                          <Image src={product.productImage[0]} alt="T-shirt" width={500} height={500} />
+                          <Image 
+                            src={product.productImage[0]} 
+                            alt={product.name} 
+                            width={500} 
+                            height={500}
+                            className="w-full h-auto"
+                          />
                         </Link>
 
                         {/* Badges */}
@@ -436,8 +519,16 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
                         
                         <div className='flex items-center gap-2'>
                           <div>
-                            {renderRating(product.totalRating)}
+                            {renderRating(productId)}
                           </div>
+                          {ratingInfo && !isLoading && (
+                            <span className="text-sm text-gray-600">
+                              ({ratingInfo.totalRatings})
+                            </span>
+                          )}
+                          {isLoading && (
+                            <span className="text-sm text-gray-400">Loading...</span>
+                          )}
                           <div className='flex items-center gap-1'>
                             {product.color.map((color, index) => (
                               <div 
@@ -451,7 +542,9 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
                           </div>
                         </div>
                         
-                        <p className="text-gray-600 text-sm items-center mt-1">{product.reviews} reviews</p>
+                        <p className="text-gray-600 text-sm items-center mt-1">
+                          
+                        </p>
                         
                         <div className='flex gap-1 flex-wrap mt-2'>
                           {product.size.map((s, index) => (
@@ -478,8 +571,19 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
             })}
           </div>
 
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <h3 className="text-xl font-semibold text-gray-600">No products found</h3>
+              <p className="text-gray-500 mt-2">
+                {minRating > 0 
+                  ? `No products match your filter of ${minRating}+ stars. Try a different rating filter.`
+                  : 'No products available in this category.'
+                }
+              </p>
+            </div>
+          )}
           
-          {pagination.totalPages > 1 && (
+          {pagination.totalPages > 1 && filteredProducts.length > 0 && (
             <div className="flex justify-center mt-8 w-full">
               <div className="bg-white border rounded-lg p-2 shadow-sm">
                 {renderPagination()}

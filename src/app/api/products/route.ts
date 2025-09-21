@@ -1,5 +1,5 @@
 import { db } from "@/db/db";
-import { productsTable } from "@/db/schema";
+import { productsTable, ratingTable } from "@/db/schema";
 import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,20 +8,18 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
-
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const Size = parseInt(searchParams.get("Size") || "10", 10);
-    const offset = (page - 1) * Size;
-
+    const size = parseInt(searchParams.get("size") || "10", 10);
+    const offset = (page - 1) * size;
 
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const producttype = searchParams.get("producttype");
     const name = searchParams.get("name");
-    const sort = searchParams.get("sort") || "id"; 
+    const sort = searchParams.get("sort") || "id";
     const order = searchParams.get("order") === "desc" ? "desc" : "asc";
-    const totalRating = searchParams.get("totalRating");
-
+    const readTime = searchParams.get("readTime");
+    const rating = searchParams.get("rating");
 
     const sortColumns = {
       id: productsTable.id,
@@ -29,48 +27,108 @@ export async function GET(req: Request) {
       name: productsTable.name,
       featured: productsTable.producttype,
       category: productsTable.category,
-      totalRating: productsTable.totalRating,
       createdAt: productsTable.createdAt,
+      averageRating: sql<number>`average_rating`,
+      totalRatings: sql<number>`total_ratings`,
     } as const;
 
+    const sortColumn =
+      sortColumns[sort as keyof typeof sortColumns] || productsTable.id;
 
-    const sortColumn = sortColumns[sort as keyof typeof sortColumns] || productsTable.id;
+    // product filters
+    const productConditions = [];
+    if (minPrice) productConditions.push(gte(productsTable.price, Number(minPrice)));
+    if (maxPrice) productConditions.push(lte(productsTable.price, Number(maxPrice)));
+    if (producttype) productConditions.push(eq(productsTable.producttype, producttype));
+    if (name) productConditions.push(eq(productsTable.name, name));
+    if (readTime) productConditions.push(eq(productsTable.readTime, Number(readTime)));
 
+    // ratings subquery
+    const ratingsSubquery = db.$with("ratings").as(
+      db
+        .select({
+          productId: ratingTable.productId,
+          averageRating: sql<number>`COALESCE(AVG(${ratingTable.rating}::numeric), 0)`.as("average_rating"),
+          totalRatings: sql<number>`COUNT(${ratingTable.id})`.as("total_ratings"),
+        })
+        .from(ratingTable)
+        .groupBy(ratingTable.productId)
+    );
 
-    let conditions = [];
-    if (minPrice) conditions.push(gte(productsTable.price, Number(minPrice)));
-    if (maxPrice) conditions.push(lte(productsTable.price, Number(maxPrice)));
-    if (producttype) conditions.push(eq(productsTable.producttype, producttype));
-    if (name) conditions.push(eq(productsTable.name, name));
-    if (totalRating) conditions.push(eq(productsTable.totalRating, totalRating));
-    
-
-    // Query
-    const products = await db
-      .select()
+    // main query
+    let baseQuery = db
+      .with(ratingsSubquery)
+      .select({
+        id: productsTable.id,
+        name: productsTable.name,
+        description: productsTable.description,
+        price: productsTable.price,
+        productImage: productsTable.productImage,
+        color: productsTable.color,
+        spcefication: productsTable.spcefication,
+        category: productsTable.category,
+        producttype: productsTable.producttype,
+        readTime: productsTable.readTime,
+        quantity: productsTable.quantity,
+        size: productsTable.size,
+        isFavorite: productsTable.isFavorite,
+        createdAt: productsTable.createdAt,
+        updatedAt: productsTable.updatedAt,
+        averageRating: sql<number>`COALESCE(${ratingsSubquery.averageRating}, 0)`,
+        totalRatings: sql<number>`COALESCE(${ratingsSubquery.totalRatings}, 0)`,
+      })
       .from(productsTable)
-      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .leftJoin(ratingsSubquery, eq(productsTable.id, ratingsSubquery.productId));
+
+    // filters
+    let whereConditions: any[] = [];
+    if (productConditions.length > 0) {
+      whereConditions.push(and(...productConditions));
+    }
+    if (rating) {
+      const ratingValue = Number(rating);
+      whereConditions.push(
+        sql`ROUND(COALESCE(${ratingsSubquery.averageRating}, 0)) = ${ratingValue}`
+      );
+    }
+
+    if (whereConditions.length === 1) {
+      baseQuery.where(whereConditions[0]);
+    } else if (whereConditions.length > 1) {
+      baseQuery.where(and(...whereConditions));
+    }
+
+    const products = await baseQuery
       .orderBy(order === "desc" ? desc(sortColumn) : asc(sortColumn))
-      .limit(Size)
+      .limit(size)
       .offset(offset);
 
-    // Count total
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)` })
+    // count query
+    let countQuery = db
+      .with(ratingsSubquery)
+      .select({ count: sql<number>`COUNT(*)` })
       .from(productsTable)
-      .where(conditions.length > 0 ? and(...conditions) : undefined);
+      .leftJoin(ratingsSubquery, eq(productsTable.id, ratingsSubquery.productId));
+
+    if (whereConditions.length === 1) {
+      countQuery.where(whereConditions[0]);
+    } else if (whereConditions.length > 1) {
+      countQuery.where(and(...whereConditions));
+    }
+
+    const [{ count }] = await countQuery;
 
     return NextResponse.json({
       data: products,
       pagination: {
         page,
-        Size,
-        total: count,
-        totalPages: Math.ceil(count / Size),
+        size,
+        total: Number(count),
+        totalPages: Math.ceil(Number(count) / size),
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Products API error:", error);
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
   }
 }
@@ -99,9 +157,8 @@ export async function POST(req: NextRequest) {
             size: body.size,
             spcefication: body.spcefication,
             color: body.color,
-            totalRating: body.totalRating || "0",
             quantity: body.quantity,
-            reviews: body.reviews || "0",
+            readTime: body.readTime || "0",
             createdAt: new Date(),
             updatedAt: new Date()
         }).returning();

@@ -22,7 +22,7 @@ export const getProducts = async (page?: string, Size?: string, query?: { [key: 
           params.append(param, query[param]!.toString());
         }
     });
-    
+
     try {
         const res = await fetch(`${baseurl}/products?${params.toString()}`, {
             method: 'GET',

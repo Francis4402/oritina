@@ -1,5 +1,6 @@
 "use server"
 
+import { RatingResponse } from "@/app/types/Types";
 import { authOptions } from "@/app/utils/authOptions"
 import { getServerSession } from "next-auth"
 import { revalidateTag } from "next/cache";
@@ -35,31 +36,32 @@ export const postRating = async (data: {ratings: number; productId: string}) => 
 }
 
 
-export const fetchRatings = async (productId: string) => {
-    const response = await fetch(`/api/rating/${productId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        next: {
-            tags: ['rating']
+export const fetchRatings = async (productId: string): Promise<RatingResponse> => {
+    try {
+        
+        const response = await fetch(`${baseUrl}/rating/${productId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            next: {
+                tags: ['rating']
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ratings`);
         }
-    });
-    
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to fetch ratings');
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching ratings:', error);
+        // Return a default response structure to prevent component crashes
+        return {
+            ratings: [],
+            averageRating: 0,
+            totalRatings: 0,
+            ratingDistribution: [0, 0, 0, 0, 0]
+        };
     }
-    
-    return response.json();
 };
-
-// export const calculateAverageRating = (ratings: any[]): number => {
-//     if (!ratings.length) return 0;
-//     const sum = ratings.reduce((acc, rating) => acc + rating.rating, 0);
-//     return Number((sum / ratings.length).toFixed(1));
-// };
-
-// export const getUserRating = (ratings: any[], userId: string) => {
-//     return ratings.find(rating => rating.user.id === userId);
-// };

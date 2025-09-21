@@ -71,13 +71,15 @@ export async function PATCH(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
+        
         const id = req.nextUrl.pathname.split("/").pop();
 
         if (!id) {
-            return NextResponse.json({ error: "rating ID is required" }, { status: 400 });
+            return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
         }
 
-        const data = await db
+        
+        const ratings = await db
             .select({
                 id: ratingTable.id,
                 rating: ratingTable.rating,
@@ -93,9 +95,55 @@ export async function GET(req: NextRequest) {
             .leftJoin(usersTable, eq(ratingTable.userId, usersTable.id))
             .where(eq(ratingTable.productId, id));
 
-        return NextResponse.json({ data }, { status: 200 });
+        
+        const averageRating = calculateAverageRating(ratings);
+        
+        
+        const ratingDistribution = getRatingDistribution(ratings);
+        
+        
+        const totalRatings = ratings.length;
+
+        return NextResponse.json({ 
+            ratings,
+            averageRating,
+            totalRatings,
+            ratingDistribution 
+        }, { status: 200 });
+        
     } catch (error) {
         console.error("Fetch rating error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
+}
+
+
+function calculateAverageRating(ratings: any[]): number {
+    if (!ratings || ratings.length === 0) {
+        return 0;
+    }
+    
+    const validRatings = ratings.filter(r => 
+        r && typeof r.rating === 'number' && r.rating >= 1 && r.rating <= 5
+    );
+    
+    if (validRatings.length === 0) return 0;
+    
+    const sum = validRatings.reduce((acc, rating) => acc + rating.rating, 0);
+    return Number((sum / validRatings.length).toFixed(1));
+}
+
+
+function getRatingDistribution(ratings: any[]): number[] {
+    const distribution = [0, 0, 0, 0, 0]; // 1-5 stars
+    
+    if (!ratings) return distribution;
+    
+    ratings.forEach(rating => {
+        if (rating && typeof rating.rating === 'number' && rating.rating >= 1 && rating.rating <= 5) {
+            distribution[rating.rating - 1]++;
+        }
+    });
+    
+    return distribution;
 }

@@ -38,10 +38,11 @@ export interface product {
     color: string[];
     size: string[];
     spcefication: string[];
-    totalRating?: string;
-    reviews?: string;
+    readTime?: number;
     createdAt?: string;
     updatedAt?: string;
+    averageRating?: number;
+    totalRatings?: number;
 }
 
 export interface blog {
@@ -65,25 +66,43 @@ export interface category {
 }
 
 
-export interface rating {
-    id?: string;
-    productId: string;
-    userId: string;
-    rating: string;
-    createdAt?: string;
-    updatedAt?: string;
+export interface Rating {
+  id?: string;
+  rating: number;
+  user: {
+    id: string;
+    name?: string;
+    email?: string;
+    image?: string;
+  };
+  productId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface RatingResponse {
+  ratings: Rating[];
+  averageRating: number;
+  totalRatings: number;
+  ratingDistribution: number[];
 }
 
 
 export interface SearchParams {
-    search?: string;
-    category?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    rating?: string;
-    sort?: string;
-    page?: string;
-    view?: string;
+  search?: string;
+  category?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  rating?: RatingResponse[];
+  sort?: string;
+  page?: string;
+  view?: string;
+}
+
+export interface ProductRating {
+  productId: string;
+  averageRating: number;
+  totalRatings: number;
 }
 
 export interface CartItem {
@@ -95,7 +114,6 @@ export interface CartItem {
   quantity: number
   selectedColor?: string
   selectedSize?: string
-  totalRating?: string
   category?: string
   availableColors?: string[]
   availableSizes?: string[]

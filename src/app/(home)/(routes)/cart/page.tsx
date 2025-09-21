@@ -177,14 +177,12 @@ const CartPage = () => {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-lg text-gray-900 mb-1">{item.name}</h3>
                           <div className="flex items-center gap-2 mb-2">
-                            <div className="flex items-center gap-1">
-                              {renderStars(4.7)}
-                            </div>
+                            
                             <span className="text-sm text-gray-500">(67)</span>
                           </div>
                           <div className="flex flex-wrap gap-3 text-sm text-gray-600">
                             {item.selectedSize && (
-                              <span className='flex gap-1'>Size: <span className='uppercase font-medium'>{item.selectedSize}</span></span>
+                              <span className='flex gap-1'>Size: <Badge variant="outline" className="uppercase">{item.selectedSize}</Badge></span>
                             )}
                             {item.selectedColor && (
                               <span className="flex items-center gap-1">

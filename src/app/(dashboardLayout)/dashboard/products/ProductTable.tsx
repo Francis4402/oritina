@@ -79,14 +79,9 @@ const ProductTable = ({product}: {product: product[]}) => {
             cell: ({row}) => <div className="text-left">{row.getValue('category')}</div>
         },
         {
-            accessorKey: 'totalRating',
-            header: 'Total Rating',
-            cell: ({row}) => <div className="text-left">{row.getValue('totalRating')}</div>
-        },
-        {
-            accessorKey: 'reviews',
-            header: 'Reviews',
-            cell: ({row}) => <div className="text-left">{row.getValue('reviews')}</div>
+            accessorKey: 'readTime',
+            header: 'ReadTime',
+            cell: ({row}) => <div className="text-left">{row.getValue('readTime')}</div>
         },
         {
             accessorKey: 'producttype',

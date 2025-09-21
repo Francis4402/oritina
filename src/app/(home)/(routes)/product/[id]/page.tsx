@@ -1,8 +1,8 @@
 
 import { getProduct, getProducts } from "@/services/Product";
-import { ProductDetails } from "../ProductDetails";
 import { product } from "@/app/types/Types";
 import { getProductComment } from "@/services/ProductComments";
+import { ProductDetails } from "../ProductDetails";
 
 
 export async function generateMetadata({params}: {params: Promise<{id: string}>}) {

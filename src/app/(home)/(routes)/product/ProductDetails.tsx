@@ -1,6 +1,6 @@
 'use client';
 
-import { product, productCommentType } from '@/app/types/Types';
+import { product, productCommentType, Rating, RatingResponse } from '@/app/types/Types';
 import CommentRatingUtils from '@/components/CommentRatingUtils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,26 +8,40 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useCartStore } from '@/lib/store';
+import { fetchRatings } from '@/services/Rating';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaHeart, FaShare, FaShoppingBag, FaStar, FaRegStar, FaChevronRight } from 'react-icons/fa';
 import { toast } from 'sonner';
+
 
 export const ProductDetails = ({ productData, relatedProducts, commentList, id }: { productData: product, relatedProducts: product[], commentList: productCommentType[], id: string }) => {
     const [selectedImage, setSelectedImage] = useState(productData.productImage[0]);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
+    const [ratingData, setRatingData] = useState<RatingResponse>({
+        ratings: [],
+        averageRating: 0,
+        totalRatings: 0,
+        ratingDistribution: [0,0,0,0,0]
+    });
     
     const { addToCart } = useCartStore();
     
-    const renderRating = (rating: string = "0") => {
-        const numericRating = parseFloat(rating);
+    useEffect(() => {
+        fetchRatings(id).then((data) => (
+            setRatingData(data)
+        ))
+    }, [id]);
+
+
+    const renderRating = (rating: number = 0) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
             stars.push(
-                i <= numericRating ? 
+                i <= rating ? 
                 <FaStar key={i} className="text-yellow-400 inline" size={16} /> : 
                 <FaRegStar key={i} className="text-gray-300 inline" size={16} />
             );
@@ -52,7 +66,6 @@ export const ProductDetails = ({ productData, relatedProducts, commentList, id }
             price: productData.price,
             productImage: productData.productImage,
             category: productData.category,
-            totalRating: productData.totalRating,
             quantity: quantity,
             description: productData.description,
             selectedColor: selectedColor || undefined,
@@ -73,7 +86,6 @@ export const ProductDetails = ({ productData, relatedProducts, commentList, id }
         { size: 'XL', chest: 43, length: 29, sleeve: 9 },
         { size: '2XL', chest: 45, length: 30, sleeve: 9.25 },
     ];
-
 
     return (
         <div className="container mx-auto px-4 py-8 poppins max-w-6xl">
@@ -128,10 +140,10 @@ export const ProductDetails = ({ productData, relatedProducts, commentList, id }
                         {/* Rating */}
                         <div className="flex items-center gap-2 mt-2">
                             <div className="flex">
-                                {renderRating(productData.totalRating)}
+                                {renderRating(ratingData.averageRating)}
                             </div>
                             <span className="text-sm text-muted-foreground">
-                                ({productData.reviews || 0} reviews)
+                                ({ratingData.totalRatings} ratings)
                             </span>
                         </div>
                     </div>
@@ -289,7 +301,7 @@ export const ProductDetails = ({ productData, relatedProducts, commentList, id }
                     <TabsList className="grid w-full grid-cols-2 mb-8">
                         <TabsTrigger value="description" className="text-lg font-medium py-3">Description</TabsTrigger>
                         <TabsTrigger value="reviews" className="text-lg font-medium py-3">
-                            Reviews {productData.reviews && `(${productData.reviews})`}
+                            Reviews ({ratingData.totalRatings})
                         </TabsTrigger>
                     </TabsList>
                     
@@ -337,7 +349,10 @@ export const ProductDetails = ({ productData, relatedProducts, commentList, id }
                     <TabsContent value="reviews">
                         <Card>
                             <CardContent className="p-6">
-                                <CommentRatingUtils commentList={commentList} productId={id} />
+                                <CommentRatingUtils 
+                                    commentList={commentList} 
+                                    productId={id} 
+                                />
                             </CardContent>
                         </Card>
                     </TabsContent>
@@ -374,7 +389,7 @@ export const ProductDetails = ({ productData, relatedProducts, commentList, id }
                                         <div className="flex justify-between items-center mt-2">
                                             <span className="text-lg font-bold text-primary">${product.price.toFixed(2)}</span>
                                             <div className="flex">
-                                                {renderRating(product.totalRating)}
+                                                
                                             </div>
                                         </div>
                                         <Button className="w-full mt-4" size="sm">

@@ -18,6 +18,7 @@ export const useCartStore = create<CartStore>()(
         addToCart: (product) =>
           set((state) => {
             const itemKey = getCartItemKey(product.id, product.selectedColor, product.selectedSize)
+            
             const existingItem = state.cart.find(
               (item) => getCartItemKey(item.id, item.selectedColor, item.selectedSize) === itemKey
             )

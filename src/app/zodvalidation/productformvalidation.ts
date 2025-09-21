@@ -35,14 +35,6 @@ export const productValidationSchema = z.object({
     category: z.string().min(3).max(255, {
         message: "Please Enter Category"
     }),
-
-    totalRating: z.string().min(3).max(255, {
-        message: "Please Enter Total Rating"
-    }).optional(),
-
-    reviews: z.string().min(3).max(255, {
-        message: "Please Enter Reviews"
-    }).optional(),
 });
 
 export type ProductValidation = z.infer<typeof productValidationSchema>;

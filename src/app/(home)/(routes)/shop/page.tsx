@@ -31,7 +31,7 @@ const Shop = async (props: { searchParams: Promise<Record<string, string | strin
       maxPrice: params.maxPrice,
       producttype: params.producttype,
       sort: params.sort,
-      totalRating: params.totalRating
+      rating: params.rating,
     },
   );
 
