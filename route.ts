@@ -3,7 +3,7 @@ export const publicRoutes = [
 ];
 
 export const adminRoutes = [
-    "/dashboard", "/product/:id", "/blogs/:id", "/dashboard/comments", "/dashboard/products", "/dashboard/blogs", "/dashboard/category", "/cart"
+    "/dashboard", "/product/:id", "/blogs/:id", "/dashboard/proudct-comments", "/dashboard/blog-comments", "/dashboard/products", "/dashboard/blogs", "/dashboard/category", "/cart"
 ];
 
 export const userRoutes = [

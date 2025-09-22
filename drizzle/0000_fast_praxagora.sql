@@ -1,11 +1,11 @@
-CREATE TYPE "public"."order_status" AS ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('User', 'Admin');--> statement-breakpoint
 CREATE TABLE "blogs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"description" text NOT NULL,
+	"category" varchar(255) NOT NULL,
 	"blog_image" text NOT NULL,
-	"blog_type" varchar(255) NOT NULL,
+	"read_time" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -19,8 +19,8 @@ CREATE TABLE "categories" (
 --> statement-breakpoint
 CREATE TABLE "comments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"blog_id" uuid NOT NULL,
 	"user_id" uuid NOT NULL,
+	"blog_id" uuid NOT NULL,
 	"comment" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
@@ -28,8 +28,9 @@ CREATE TABLE "comments" (
 --> statement-breakpoint
 CREATE TABLE "likes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"blog_id" uuid NOT NULL,
 	"user_id" uuid NOT NULL,
+	"blog_id" uuid NOT NULL,
+	"liked" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -42,8 +43,17 @@ CREATE TABLE "orders" (
 	"shipping" integer NOT NULL,
 	"tax" integer NOT NULL,
 	"shipping_address" text NOT NULL,
-	"order_status" "order_status" DEFAULT 'Pending' NOT NULL,
+	"status" varchar DEFAULT 'Pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "productComment" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"product_id" uuid NOT NULL,
+	"comment" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "products" (
@@ -56,8 +66,7 @@ CREATE TABLE "products" (
 	"spcefication" varchar(255)[] NOT NULL,
 	"category" varchar(255) NOT NULL,
 	"producttype" varchar(255) NOT NULL,
-	"totalRating" varchar(255),
-	"reviews" varchar(255),
+	"read_time" integer,
 	"quantity" integer NOT NULL,
 	"size" varchar(255)[] NOT NULL,
 	"is_favorite" boolean DEFAULT false NOT NULL,
@@ -69,7 +78,7 @@ CREATE TABLE "rating" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"product_id" uuid NOT NULL,
 	"user_id" uuid NOT NULL,
-	"rating" varchar(255) NOT NULL,
+	"rating" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -87,9 +96,11 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-ALTER TABLE "comments" ADD CONSTRAINT "comments_blog_id_blogs_id_fk" FOREIGN KEY ("blog_id") REFERENCES "public"."blogs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "comments" ADD CONSTRAINT "comments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "likes" ADD CONSTRAINT "likes_blog_id_blogs_id_fk" FOREIGN KEY ("blog_id") REFERENCES "public"."blogs"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "comments" ADD CONSTRAINT "comments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "comments" ADD CONSTRAINT "comments_blog_id_blogs_id_fk" FOREIGN KEY ("blog_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "likes" ADD CONSTRAINT "likes_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "rating" ADD CONSTRAINT "rating_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "likes" ADD CONSTRAINT "likes_blog_id_blogs_id_fk" FOREIGN KEY ("blog_id") REFERENCES "public"."blogs"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "productComment" ADD CONSTRAINT "productComment_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "productComment" ADD CONSTRAINT "productComment_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "rating" ADD CONSTRAINT "rating_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "rating" ADD CONSTRAINT "rating_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;

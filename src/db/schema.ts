@@ -1,8 +1,6 @@
-import { relations } from "drizzle-orm";
 import { pgEnum, text, pgTable, timestamp, uuid, varchar, integer, boolean } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum('user_role', ['User', 'Admin']);
-export const orderStatusEnum = pgEnum('order_status', ['Pending', 'Shipped', 'Delivered', 'Cancelled']);
 
 
 export const usersTable = pgTable("users", {
@@ -97,6 +95,6 @@ export const orderTable = pgTable("orders", {
   shipping: integer("shipping").notNull(),
   tax: integer("tax").notNull(),
   shippingAddress: text("shipping_address").notNull(),
-  order: orderStatusEnum("order_status").notNull().default("Pending"),
+  status: varchar("status").notNull().default("Pending"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

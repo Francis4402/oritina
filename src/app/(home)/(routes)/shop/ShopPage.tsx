@@ -431,8 +431,8 @@ useEffect(() => {
             <div>
               <h1 className="text-2xl font-bold">T-Shirts Collection</h1>
               <p className="text-gray-600">
-                Showing {((pagination.page - 1) * pagination.Size) + 1} to{' '}
-                {Math.min(pagination.page * pagination.Size, parseInt(pagination.total))} of{' '}
+                {/* Showing {((pagination.page - 1) * pagination.Size) + 1} to{' '}
+                {Math.min(pagination.page * pagination.Size, parseInt(pagination.total))} of{' '} */}
                 {pagination.total} products
                 {minRating > 0 && ` (Filtered by ${minRating}+ stars)`}
               </p>

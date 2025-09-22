@@ -1,5 +1,5 @@
 {
-  "id": "80c963b4-8bec-4c89-8be1-9f4e0c1bb562",
+  "id": "a7889c03-e1f7-48fc-86bd-38a6e83c8c01",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -27,17 +27,23 @@
           "primaryKey": false,
           "notNull": true
         },
+        "category": {
+          "name": "category",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "blog_image": {
           "name": "blog_image",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "blog_type": {
-          "name": "blog_type",
-          "type": "varchar(255)",
+        "read_time": {
+          "name": "read_time",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -113,14 +119,14 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "blog_id": {
-          "name": "blog_id",
+        "user_id": {
+          "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
+        "blog_id": {
+          "name": "blog_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -148,19 +154,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "comments_blog_id_blogs_id_fk": {
-          "name": "comments_blog_id_blogs_id_fk",
-          "tableFrom": "comments",
-          "tableTo": "blogs",
-          "columnsFrom": [
-            "blog_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "comments_user_id_users_id_fk": {
           "name": "comments_user_id_users_id_fk",
           "tableFrom": "comments",
@@ -171,7 +164,20 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "comments_blog_id_blogs_id_fk": {
+          "name": "comments_blog_id_blogs_id_fk",
+          "tableFrom": "comments",
+          "tableTo": "blogs",
+          "columnsFrom": [
+            "blog_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -192,17 +198,24 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "blog_id": {
           "name": "blog_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
+        "liked": {
+          "name": "liked",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -221,19 +234,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "likes_blog_id_blogs_id_fk": {
-          "name": "likes_blog_id_blogs_id_fk",
-          "tableFrom": "likes",
-          "tableTo": "blogs",
-          "columnsFrom": [
-            "blog_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "likes_user_id_users_id_fk": {
           "name": "likes_user_id_users_id_fk",
           "tableFrom": "likes",
@@ -245,6 +245,19 @@
             "id"
           ],
           "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "likes_blog_id_blogs_id_fk": {
+          "name": "likes_blog_id_blogs_id_fk",
+          "tableFrom": "likes",
+          "tableTo": "blogs",
+          "columnsFrom": [
+            "blog_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -301,10 +314,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "order_status": {
-          "name": "order_status",
-          "type": "order_status",
-          "typeSchema": "public",
+        "status": {
+          "name": "status",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true,
           "default": "'Pending'"
@@ -319,6 +331,85 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.productComment": {
+      "name": "productComment",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "productComment_user_id_users_id_fk": {
+          "name": "productComment_user_id_users_id_fk",
+          "tableFrom": "productComment",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "productComment_product_id_products_id_fk": {
+          "name": "productComment_product_id_products_id_fk",
+          "tableFrom": "productComment",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -384,15 +475,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "totalRating": {
-          "name": "totalRating",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reviews": {
-          "name": "reviews",
-          "type": "varchar(255)",
+        "read_time": {
+          "name": "read_time",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -463,7 +548,7 @@
         },
         "rating": {
           "name": "rating",
-          "type": "varchar(255)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -494,7 +579,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "rating_user_id_users_id_fk": {
@@ -599,16 +684,6 @@
     }
   },
   "enums": {
-    "public.order_status": {
-      "name": "order_status",
-      "schema": "public",
-      "values": [
-        "Pending",
-        "Shipped",
-        "Delivered",
-        "Cancelled"
-      ]
-    },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",

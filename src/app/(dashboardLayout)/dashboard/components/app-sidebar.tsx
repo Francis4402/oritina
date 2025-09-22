@@ -51,8 +51,13 @@ const data = {
       icon: MessageSquare
     },
     {
-      name: "Comments",
-      url: "/dashboard/comments",
+      name: "Product-Comments",
+      url: "/dashboard/proudct-comments",
+      icon: MessageSquare
+    },
+    {
+      name: "Blog-Comments",
+      url: "/dashboard/blog-comments",
       icon: MessageSquare
     }
   ],
