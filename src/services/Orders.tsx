@@ -13,7 +13,6 @@ export const GetOrders = async () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session?.accessToken}`
             },
-            cache: 'no-store',
         });
 
         return res.json();

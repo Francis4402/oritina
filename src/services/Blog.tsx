@@ -13,7 +13,6 @@ export const getBlogs = async () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store',
             next: {
                 tags: ['blogs']
             }

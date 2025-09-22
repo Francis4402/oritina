@@ -14,7 +14,6 @@ export const getProductCategory = async () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store',
             next: {
                 tags: ['category']
             }
