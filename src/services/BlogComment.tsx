@@ -16,7 +16,6 @@ export const getAllBlogComments = async () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            cache: 'no-store',
             next: {
                 tags: ['comment']
             }
