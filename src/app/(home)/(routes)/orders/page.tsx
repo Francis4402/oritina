@@ -15,6 +15,7 @@ const Orders = async () => {
     // Calculate some stats for the header
     const totalOrders = orders.length;
     const pendingOrders = orders.filter(order => order.status === 'Pending').length;
+    const deliveredOrders = orders.filter(order => order.status === 'Delivered').length;
     const completedOrders = orders.filter(order => order.status === 'Completed').length;
 
     return (
@@ -55,6 +56,19 @@ const Orders = async () => {
                         <div className="text-xl lg:text-2xl font-bold">{pendingOrders}</div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Needs attention
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card className="flex-1 min-w-0">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 lg:p-6">
+                        <CardTitle className="text-xs lg:text-sm font-medium">Delivered</CardTitle>
+                        <div className="text-lg">⏳</div>
+                    </CardHeader>
+                    <CardContent className="p-4 lg:p-6 pt-0">
+                        <div className="text-xl lg:text-2xl font-bold">{deliveredOrders}</div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            deliverd to customer
                         </p>
                     </CardContent>
                 </Card>
@@ -118,12 +132,15 @@ const Orders = async () => {
                 <CardContent className="p-0 lg:p-6 pt-0">
                     {/* Tabs for different order views */}
                     <Tabs defaultValue="all" className="space-y-4 p-4 lg:p-0">
-                        <TabsList className="grid grid-cols-4 w-full h-auto p-1">
+                        <TabsList className="grid grid-cols-5 w-full h-auto p-1">
                             <TabsTrigger value="all" className="text-xs py-2 px-1 truncate">
                                 All
                             </TabsTrigger>
                             <TabsTrigger value="Pending" className="text-xs py-2 px-1 truncate">
                                 Pending
+                            </TabsTrigger>
+                            <TabsTrigger value="Delivered" className="text-xs py-2 px-1 truncate">
+                                Delivered
                             </TabsTrigger>
                             <TabsTrigger value="Completed" className="text-xs py-2 px-1 truncate">
                                 Completed
@@ -142,6 +159,12 @@ const Orders = async () => {
                         <TabsContent value="Pending" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
                                 <OrderTable orders={orders.filter(order => order.status === 'Pending')} />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="Delivered" className="space-y-4 mt-4">
+                            <div className="overflow-x-auto">
+                                <OrderTable orders={orders.filter(order => order.status === 'Delivered')} />
                             </div>
                         </TabsContent>
                         
