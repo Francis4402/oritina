@@ -33,7 +33,7 @@ const UpdateProductModel = ({product}: {product: product}) => {
     form.setValue('size', selectedSizes as ("M" | "L" | "XL" | "2XL")[]);
   }, [selectedSizes]);
 
-  // Initialize form with proper default values including spcefication and color
+  
   const form = useForm({
     resolver: zodResolver(productValidationSchema),
     defaultValues: {

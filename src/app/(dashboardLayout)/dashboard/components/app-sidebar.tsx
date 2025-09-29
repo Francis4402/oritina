@@ -2,10 +2,13 @@
 
 import * as React from "react"
 import {
+  GitFork,
   LayoutDashboard,
   MessageSquare,
+  Package,
   ShoppingBag,
   SquareTerminal,
+  Table,
 } from "lucide-react"
 
 
@@ -48,17 +51,22 @@ const data = {
     {
       name: "Categories",
       url: "/dashboard/category",
-      icon: MessageSquare
+      icon: GitFork
     },
     {
       name: "Product-Comments",
       url: "/dashboard/proudct-comments",
-      icon: MessageSquare
+      icon: Package
     },
     {
       name: "Blog-Comments",
       url: "/dashboard/blog-comments",
       icon: MessageSquare
+    },
+    {
+      name: "Orders",
+      url: "/dashboard/orders",
+      icon: Table
     }
   ],
 }

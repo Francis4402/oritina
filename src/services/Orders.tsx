@@ -13,6 +13,7 @@ export const GetOrders = async () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session?.accessToken}`
             },
+            cache: "no-store",
         });
 
         return res.json();
@@ -38,5 +39,28 @@ export const PostOrder = async (sessionId: string) => {
     } catch (error) {
         console.log(error);
         return null;
+    }
+}
+
+
+export const UpdateOrderStatus = async (id: string) => {
+    try {
+        const response = await fetch(`${process.env.BASE_URL}/order/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id }),
+            cache: 'no-store',
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update order status');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log(error);
     }
 }

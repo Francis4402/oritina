@@ -29,6 +29,7 @@ export const getProducts = async (page?: string, Size?: string, query?: { [key: 
             headers: {
                 'Content-Type': 'application/json',
             },
+            cache: "no-store",
             next: {
                 tags: ['products']
             }

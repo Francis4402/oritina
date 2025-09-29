@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, Download, Printer, Truck, Home, Calendar, DollarSign, Package } from "lucide-react";
+import { CheckCircle, Download, Printer, Truck, Home, Calendar, DollarSign, Package, Circle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -90,7 +90,7 @@ const Success = () => {
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle>No orders found</CardTitle>
@@ -109,7 +109,7 @@ const Success = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Success Header */}
         <div className="text-center mb-10">
@@ -118,10 +118,10 @@ const Success = () => {
               <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold mb-2">
             Order Confirmed!
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg max-w-2xl mx-auto">
             Thank you for your purchase. Your order has been confirmed and is
             being processed.
           </p>
@@ -130,7 +130,7 @@ const Success = () => {
           </p>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
           <Package className="h-6 w-6" />
           Your Orders
         </h2>
@@ -138,12 +138,12 @@ const Success = () => {
         {/* Map through all orders */}
         {orders.map((order) => (
           <Card key={order.id} className="mb-8 overflow-hidden">
-            <CardHeader className="bg-gray-50 pb-4">
+            <CardHeader className="pb-4">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <CardTitle className="text-xl">Order #{order.id}</CardTitle>
                 <Badge className="bg-green-100 text-green-800 hover:bg-green-100 px-3 py-1">
-                  <CheckCircle className="h-4 w-4 mr-1" />
-                  Confirmed
+                    <Circle className="h-4 w-4 mr-1" />
+                    {order.status}
                 </Badge>
               </div>
             </CardHeader>
@@ -197,9 +197,9 @@ const Success = () => {
                       </div>
                       <div>
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-500">Size: {item.size}</p>
-                        <p className="text-sm text-gray-500">Color: {item.color}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm">Size: {item.size}</p>
+                        <p className="text-sm">Color: {item.color}</p>
+                        <p className="text-sm">
                           Quantity: {item.quantity}
                         </p>
                       </div>
@@ -215,17 +215,17 @@ const Success = () => {
               
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span>Subtotal</span>
                   <span className="font-medium">
                     ${((order.total - order.shipping - order.tax) / 100).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
+                  <span>Shipping</span>
                   <span className="font-medium">${(order.shipping / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tax</span>
+                  <span>Tax</span>
                   <span className="font-medium">${(order.tax / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-3 border-t">
@@ -236,7 +236,7 @@ const Success = () => {
             </CardContent>
 
             {/* Delivery Information for each order */}
-            <div className="bg-gray-50 px-6 py-4 border-t">
+            <div className="px-6 py-4 border-t">
               <h3 className="text-lg font-medium flex items-center gap-2 mb-4">
                 <Truck className="h-5 w-5" />
                 Delivery Information

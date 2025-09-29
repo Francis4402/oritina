@@ -44,6 +44,7 @@ export const fetchRatings = async (productId: string): Promise<RatingResponse> =
             headers: {
                 'Content-Type': 'application/json',
             },
+            cache: "no-store",
             next: {
                 tags: ['rating']
             }

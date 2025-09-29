@@ -32,9 +32,9 @@ export interface product {
     description: string;
     price: number;
     productImage: string[];
-    category: string;
+    category?: string;
     quantity: number;
-    producttype: string;
+    producttype?: string;
     color: string[];
     size: string[];
     spcefication: string[];
@@ -103,6 +103,29 @@ export interface ProductRating {
   productId: string;
   averageRating: number;
   totalRatings: number;
+}
+
+export interface OrderProduct {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  color: string;
+  size: string;
+}
+
+
+export interface TOrder {
+  id?: string;
+  userId: string;
+  products: OrderProduct[];
+  total: number;
+  shipping: number;
+  tax: number;
+  shippingAddress: string;
+  createdAt: string;
+  status: string;
 }
 
 export interface CartItem {

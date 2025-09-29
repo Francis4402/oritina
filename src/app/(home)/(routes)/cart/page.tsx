@@ -85,8 +85,8 @@ const CartPage = () => {
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
             <p className="text-xl text-gray-600 mb-8">Add some items to get started!</p>
             <Link href="/shop">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                <ArrowLeft className="mr-2 h-5 w-5" />
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+                <ArrowLeft className="mr-2 h-5 w-5 " />
                 Continue Shopping
               </Button>
             </Link>

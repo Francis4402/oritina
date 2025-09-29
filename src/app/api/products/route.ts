@@ -82,9 +82,11 @@ export async function GET(req: Request) {
 
     // filters
     let whereConditions: any[] = [];
+    
     if (productConditions.length > 0) {
       whereConditions.push(and(...productConditions));
     }
+    
     if (rating) {
       const ratingValue = Number(rating);
       whereConditions.push(
