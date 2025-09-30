@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, ShoppingCart, DollarSign, ArrowUpRight } from "lucide-react"
 import {
@@ -9,6 +9,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis } from "recharts"
+import { getAllUsers } from "@/services/Users"
+import { getAllOrders } from "@/services/Orders"
 
 const data = [
   { month: "Jan", sales: 1200, revenue: 800 },
@@ -19,6 +21,17 @@ const data = [
 ]
 
 const Dashboard = () => {
+  
+  const [users, setUsers] = useState<any>([]);
+  const [orders, setOrders] = useState<any>([]);
+
+  useEffect(() => {
+    getAllUsers().then(res => setUsers(res));
+    getAllOrders().then(res => setOrders(res));
+  }, []);
+
+  console.log(users);
+  
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       {/* Top Stats */}
@@ -29,7 +42,7 @@ const Dashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">12,450</p>
+            <p className="text-2xl font-bold">{users.length}</p>
             <p className="text-xs text-muted-foreground">+20% from last month</p>
           </CardContent>
         </Card>
@@ -40,7 +53,7 @@ const Dashboard = () => {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">1,320</p>
+            <p className="text-2xl font-bold">{orders.length}</p>
             <p className="text-xs text-muted-foreground">+12% from last week</p>
           </CardContent>
         </Card>

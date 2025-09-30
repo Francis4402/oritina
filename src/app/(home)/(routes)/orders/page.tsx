@@ -110,6 +110,14 @@ const Orders = async () => {
                                                     </label>
                                                     <label className="flex items-center space-x-2">
                                                         <input type="checkbox" className="rounded" />
+                                                        <span>Shipped</span>
+                                                    </label>
+                                                    <label className="flex items-center space-x-2">
+                                                        <input type="checkbox" className="rounded" />
+                                                        <span>Delivered</span>
+                                                    </label>
+                                                    <label className="flex items-center space-x-2">
+                                                        <input type="checkbox" className="rounded" />
                                                         <span>Completed</span>
                                                     </label>
                                                     <label className="flex items-center space-x-2">
@@ -132,12 +140,15 @@ const Orders = async () => {
                 <CardContent className="p-0 lg:p-6 pt-0">
                     {/* Tabs for different order views */}
                     <Tabs defaultValue="all" className="space-y-4 p-4 lg:p-0">
-                        <TabsList className="grid grid-cols-5 w-full h-auto p-1">
+                        <TabsList className="grid grid-cols-6 w-full h-auto p-1">
                             <TabsTrigger value="all" className="text-xs py-2 px-1 truncate">
                                 All
                             </TabsTrigger>
                             <TabsTrigger value="Pending" className="text-xs py-2 px-1 truncate">
                                 Pending
+                            </TabsTrigger>
+                            <TabsTrigger value="Shipped" className="text-xs py-2 px-1 truncate">
+                                Shipped
                             </TabsTrigger>
                             <TabsTrigger value="Delivered" className="text-xs py-2 px-1 truncate">
                                 Delivered
@@ -162,19 +173,25 @@ const Orders = async () => {
                             </div>
                         </TabsContent>
 
+                        <TabsContent value="Shipped" className="space-y-4 mt-4">
+                            <div className="overflow-x-auto">
+                                <OrderTable orders={orders.filter(order => order.status === 'Shipped')} />
+                            </div>
+                        </TabsContent>
+
                         <TabsContent value="Delivered" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
                                 <OrderTable orders={orders.filter(order => order.status === 'Delivered')} />
                             </div>
                         </TabsContent>
                         
-                        <TabsContent value="completed" className="space-y-4 mt-4">
+                        <TabsContent value="Completed" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
                                 <OrderTable orders={orders.filter(order => order.status === 'Completed')} />
                             </div>
                         </TabsContent>
                         
-                        <TabsContent value="cancelled" className="space-y-4 mt-4">
+                        <TabsContent value="Cancelled" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
                                 <OrderTable orders={orders.filter(order => order.status === 'Cancelled')} />
                             </div>

@@ -8,6 +8,7 @@ export async function PATCH(req: NextRequest) {
     try {
         
         const body = await req.json();
+        
         const { id, status } = body;
         
         if (!id || !status) {

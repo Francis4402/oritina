@@ -1,11 +1,11 @@
 import { TOrder } from "@/app/types/Types";
-import { GetOrders } from "@/services/Orders";
+import { getAllOrders } from "@/services/Orders";
 import OrderTable from "./OrderTable";
 
 
 const Orders = async () => {
 
-    const orders: TOrder[] = await GetOrders();
+    const orders: TOrder[] = await getAllOrders();
 
   return (
     <div>
