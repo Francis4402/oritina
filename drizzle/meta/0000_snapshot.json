@@ -1,5 +1,5 @@
 {
-  "id": "a7889c03-e1f7-48fc-86bd-38a6e83c8c01",
+  "id": "c84bb3d5-8968-4e3c-9566-0fbbce4f6563",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -108,8 +108,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.comments": {
-      "name": "comments",
+    "public.blogcomments": {
+      "name": "blogcomments",
       "schema": "",
       "columns": {
         "id": {
@@ -154,9 +154,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "comments_user_id_users_id_fk": {
-          "name": "comments_user_id_users_id_fk",
-          "tableFrom": "comments",
+        "blogcomments_user_id_users_id_fk": {
+          "name": "blogcomments_user_id_users_id_fk",
+          "tableFrom": "blogcomments",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -167,9 +167,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "comments_blog_id_blogs_id_fk": {
-          "name": "comments_blog_id_blogs_id_fk",
-          "tableFrom": "comments",
+        "blogcomments_blog_id_blogs_id_fk": {
+          "name": "blogcomments_blog_id_blogs_id_fk",
+          "tableFrom": "blogcomments",
           "tableTo": "blogs",
           "columnsFrom": [
             "blog_id"
@@ -636,12 +636,6 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
-        },
-        "address": {
-          "name": "address",
-          "type": "varchar(1000)",
-          "primaryKey": false,
-          "notNull": true
         },
         "role": {
           "name": "role",

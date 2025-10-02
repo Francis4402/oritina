@@ -32,20 +32,20 @@ export function LoginForm({
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
-      // const res = await signIn("credentials", {
-      //   email: data.email,
-      //   password: data.password,
-      //   callbackUrl: "http://localhost:3000",
-      //   redirect: false,
-      // });
+      const res = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        callbackUrl: "http://localhost:3000",
+        redirect: false,
+      });
 
-      // if (res?.ok) {
-      //   toast.success("Login successful");
-      //   form.reset();
-      //   router.refresh();
-      // } else {
-      //   toast.error("Login failed");
-      // }
+      if (res?.ok) {
+        toast.success("Login successful");
+        form.reset();
+        router.refresh();
+      } else {
+        toast.error("Login failed");
+      }
     } catch (error) {
       console.log(error);
       toast.error("An unexpected error occurred");
@@ -58,7 +58,6 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="w-full">
         <CardContent>
-          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">

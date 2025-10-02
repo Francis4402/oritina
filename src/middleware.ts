@@ -48,7 +48,9 @@ export async function middleware(req: NextRequest) {
     if (
       pathname.startsWith("/_next") ||
       pathname.startsWith("/api") ||
-      pathname.includes(".")
+      pathname.includes(".") ||
+      pathname === "/not-found" ||
+      pathname === "/404"
     ) {
       return NextResponse.next();
     }
@@ -76,7 +78,7 @@ export async function middleware(req: NextRequest) {
     const allowedRoutes = roleBasedRoutes[userRole || ""] || [];
   
     if (!isAllowedRoute(pathname, allowedRoutes)) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/not-found", req.url));
     }
   
     return NextResponse.next();

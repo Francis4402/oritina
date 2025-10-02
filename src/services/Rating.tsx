@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth"
 import { revalidateTag } from "next/cache";
 
 const baseUrl = process.env.BASE_URL;
+
 export const postRating = async (data: {ratings: number; productId: string}) => {
     try {
         const session = await getServerSession(authOptions);
@@ -57,7 +58,7 @@ export const fetchRatings = async (productId: string): Promise<RatingResponse> =
         return await response.json();
     } catch (error) {
         console.error('Error fetching ratings:', error);
-        // Return a default response structure to prevent component crashes
+        
         return {
             ratings: [],
             averageRating: 0,

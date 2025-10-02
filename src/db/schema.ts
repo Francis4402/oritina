@@ -9,7 +9,6 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 255 }),
   image: varchar("image", { length: 255 }),
-  address: varchar({ length: 1000 }).notNull(),
   role: userRoleEnum('role').notNull().default('User'),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -51,7 +50,7 @@ export const blogsTable = pgTable("blogs", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const commentTable = pgTable("comments", {
+export const commentTable = pgTable("blogcomments", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => usersTable.id, { onDelete: "cascade" }).notNull(),
   blogId: uuid("blog_id").references(() => blogsTable.id, { onDelete: "cascade" }).notNull(),

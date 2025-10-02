@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
 
     const page = parseInt(searchParams.get("page") || "1", 10);
-    const size = parseInt(searchParams.get("size") || "10", 10);
+    const size = parseInt(searchParams.get("size") || "10", 5);
     const offset = (page - 1) * size;
 
     const minPrice = searchParams.get("minPrice");

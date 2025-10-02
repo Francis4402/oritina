@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { getLikesById, postLike } from '@/services/Like'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 
 interface LikeButtonProps {
@@ -13,6 +14,8 @@ interface LikeButtonProps {
 
 export function LikeButton({ blogId }: LikeButtonProps) {
   const [likes, setLikes] = useState<any[]>([]);
+
+  const {data: session} = useSession();
 
   const fetchLikes = async () => {
     try {
@@ -24,7 +27,8 @@ export function LikeButton({ blogId }: LikeButtonProps) {
     }
   };
 
-  const like = likes.find(like => like.blogId === blogId && like.liked === true);
+
+  const like = likes.find(like => like.blogId === blogId && like.userId === session?.user?.id && like.liked === true);
   
   const isLiked = Boolean(like);
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -29,19 +29,27 @@ import { toast } from 'sonner'
 import { fetchRatings } from '@/services/Rating'
 
 const ShopPage = ({ products, pagination }: { products: product[], pagination: IMeta }) => {
-  
-
   const [selectedOptions, setSelectedOptions] = useState<Record<string, { size: string | null; color: string | null }>>({});
   const [productRatings, setProductRatings] = useState<Record<string, ProductRating>>({});
   const [ratingsLoading, setRatingsLoading] = useState<Record<string, boolean>>({});
   
-
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const { addToCart } = useCartStore();
 
-  
+  const [priceRange, setPriceRange] = useState<number[]>([
+    Number(searchParams.get("minPrice")) || 0,
+    Number(searchParams.get("maxPrice")) || 200
+  ])
+
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("producttype") || 'all')
+  const [sortOption, setSortOption] = useState(searchParams.get("sort") || 'featured')
+  const [viewMode, setViewMode] = useState(searchParams.get("view") || 'grid')
+  const [minRating, setMinRating] = useState(Number(searchParams.get("rating")) || 0) // Changed from minRating to rating
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1)
+
+  // Initialize selected options
   useEffect(() => {
     const initialOptions: Record<string, { size: string | null; color: string | null }> = {};
     products.forEach(product => {
@@ -53,65 +61,119 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
     setSelectedOptions(initialOptions);
   }, [products]);
 
+  // Load ratings for all products
+  useEffect(() => {
+    const loadAllRatings = async () => {
+      if (!products.length) return;
 
-useEffect(() => {
-  const loadAllRatings = async () => {
-    if (!products.length) return;
-
-    // Set loading state for all products
-    const loadingStates: Record<string, boolean> = {};
-    products.forEach(product => {
-      const productId = product.id || '';
-      if (productId) loadingStates[productId] = true;
-    });
-    setRatingsLoading(loadingStates);
-
-    try {
-      // Fetch all ratings in parallel
-      const results = await Promise.all(
-        products.map(async (product) => {
-          const productId = product.id || '';
-          if (!productId) return null;
-
-          try {
-            const data = await fetchRatings(productId);
-            return {
-              productId,
-              averageRating: data.averageRating,
-              totalRatings: data.totalRatings,
-            } as ProductRating;
-          } catch (err) {
-            console.error(`Error fetching ratings for ${productId}:`, err);
-            return {
-              productId,
-              averageRating: 0,
-              totalRatings: 0,
-            } as ProductRating;
-          }
-        })
-      );
-
-      // Build final ratings map
-      const ratingsMap: Record<string, ProductRating> = {};
-      results.forEach((res) => {
-        if (res) ratingsMap[res.productId] = res;
-      });
-
-      setProductRatings(ratingsMap);
-    } finally {
-      // Mark all products as not loading
-      const doneLoading: Record<string, boolean> = {};
+      // Set loading state for all products
+      const loadingStates: Record<string, boolean> = {};
       products.forEach(product => {
         const productId = product.id || '';
-        if (productId) doneLoading[productId] = false;
+        if (productId) loadingStates[productId] = true;
       });
-      setRatingsLoading(doneLoading);
+      setRatingsLoading(loadingStates);
+
+      try {
+        // Fetch all ratings in parallel
+        const results = await Promise.all(
+          products.map(async (product) => {
+            const productId = product.id || '';
+            if (!productId) return null;
+
+            try {
+              const data = await fetchRatings(productId);
+              return {
+                productId,
+                averageRating: data.averageRating,
+                totalRatings: data.totalRatings,
+              } as ProductRating;
+            } catch (err) {
+              console.error(`Error fetching ratings for ${productId}:`, err);
+              return {
+                productId,
+                averageRating: 0,
+                totalRatings: 0,
+              } as ProductRating;
+            }
+          })
+        );
+
+        // Build final ratings map
+        const ratingsMap: Record<string, ProductRating> = {};
+        results.forEach((res) => {
+          if (res) ratingsMap[res.productId] = res;
+        });
+
+        setProductRatings(ratingsMap);
+      } finally {
+        // Mark all products as not loading
+        const doneLoading: Record<string, boolean> = {};
+        products.forEach(product => {
+          const productId = product.id || '';
+          if (productId) doneLoading[productId] = false;
+        });
+        setRatingsLoading(doneLoading);
+      }
+    };
+
+    loadAllRatings();
+  }, [products]);
+
+  // Filter products based on rating and other criteria
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const productId = product.id || '';
+      const ratingInfo = productRatings[productId];
+      const productRating = ratingInfo?.averageRating || 0;
+
+      // Apply rating filter
+      if (minRating > 0 && productRating < minRating) {
+        return false;
+      }
+
+      // Apply price filter
+      if (product.price < priceRange[0] || product.price > priceRange[1]) {
+        return false;
+      }
+
+      // Apply category filter
+      if (selectedCategory !== 'all' && product.producttype !== selectedCategory) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [products, productRatings, minRating, priceRange, selectedCategory]);
+
+  
+  useEffect(() => {
+    const params = new URLSearchParams()
+    const { sort, order } = getSortParams(sortOption)
+
+    if (priceRange[0] > 0) params.set("minPrice", String(priceRange[0]))
+    if (priceRange[1] < 200) params.set("maxPrice", String(priceRange[1]))
+    if (selectedCategory !== "all") params.set("producttype", selectedCategory)
+    if (sort !== "id") params.set("sort", sort)
+    if (order !== "asc") params.set("order", order)
+    if (viewMode !== "grid") params.set("view", viewMode)
+    if (minRating > 0) params.set("rating", String(minRating)) // Changed from minRating to rating
+    if (page > 1) params.set("page", String(page))
+
+    router.replace(`?${params.toString()}`)
+  }, [priceRange, selectedCategory, sortOption, viewMode, minRating, page, router])
+
+  const getSortParams = (option: string) => {
+    const sortMappings: Record<string, { sort: string; order: string }> = {
+      'featured': { sort: 'id', order: 'asc' },
+      'newarrivals': { sort: 'createdAt', order: 'desc' },
+      'price-low': { sort: 'price', order: 'asc' },
+      'price-high': { sort: 'price', order: 'desc' },
+      'rating-high': { sort: 'totalRating', order: 'desc' },
+      'rating-low': { sort: 'totalRating', order: 'asc' }
     }
-  };
-
-  loadAllRatings();
-}, [products]);
-
+    return sortMappings[option] || { sort: 'id', order: 'asc' }
+  }
 
   const handleSizeSelect = (productId: string, size: string) => {
     setSelectedOptions(prev => ({
@@ -169,47 +231,6 @@ useEffect(() => {
     }
   }
 
-  const [priceRange, setPriceRange] = useState<number[]>([
-    Number(searchParams.get("minPrice")) || 0,
-    Number(searchParams.get("maxPrice")) || 200
-  ])
-
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("producttype") || 'all')
-  const [sortOption, setSortOption] = useState(searchParams.get("sort") || 'featured')
-
-  const [viewMode, setViewMode] = useState(searchParams.get("view") || 'grid')
-  const [minRating, setMinRating] = useState(Number(searchParams.get("minRating")) || 0)
-  const [page, setPage] = useState(Number(searchParams.get("page")) || 1)
-
-  
-  const getSortParams = (option: string) => {
-    const sortMappings: Record<string, { sort: string; order: string }> = {
-      'featured': { sort: 'id', order: 'asc' },
-      'newarrivals': { sort: 'createdAt', order: 'desc' },
-      'price-low': { sort: 'price', order: 'asc' },
-      'price-high': { sort: 'price', order: 'desc' },
-      'rating-high': { sort: 'totalRating', order: 'desc' },
-      'rating-low': { sort: 'totalRating', order: 'asc' }
-    }
-    return sortMappings[option] || { sort: 'id', order: 'asc' }
-  }
-
-  useEffect(() => {
-    const params = new URLSearchParams()
-    const { sort, order } = getSortParams(sortOption)
-
-    if (priceRange[0] > 0) params.set("minPrice", String(priceRange[0]))
-    if (priceRange[1] < 200) params.set("maxPrice", String(priceRange[1]))
-    if (selectedCategory !== "all") params.set("producttype", selectedCategory)
-    if (sort !== "id") params.set("sort", sort)
-    if (order !== "asc") params.set("order", order)
-    if (viewMode !== "grid") params.set("view", viewMode)
-    if (minRating > 0) params.set("rating", String(minRating))
-    if (page > 1) params.set("page", String(page))
-
-    router.replace(`?${params.toString()}`)
-  }, [priceRange, selectedCategory, sortOption, viewMode, minRating, page, router])
-
   const handleSortChange = (value: string) => {
     setSortOption(value)
     setPage(1)
@@ -220,7 +241,11 @@ useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  
+  const handleMinRatingChange = (value: string) => {
+    setMinRating(Number(value));
+    setPage(1);
+  }
+
   const renderPagination = () => {
     const currentPage = pagination.page
     const totalPages = pagination.totalPages
@@ -278,7 +303,6 @@ useEffect(() => {
       )
     }
 
-    
     if (totalPages > 1) {
       pages.push(
         <PaginationItem key={totalPages}>
@@ -333,9 +357,6 @@ useEffect(() => {
       )
     );
   };
-
-  
-  const filteredProducts = products;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -406,7 +427,7 @@ useEffect(() => {
           {/* Rating */}
           <div className="space-y-3">
             <h3 className="font-medium">Customer Rating</h3>
-            <RadioGroup value={String(minRating)} onValueChange={(value) => setMinRating(Number(value))}>
+            <RadioGroup value={String(minRating)} onValueChange={handleMinRatingChange}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="0" id="rating-all" />
                 <Label htmlFor="rating-all" className="cursor-pointer">All Ratings</Label>
@@ -431,10 +452,9 @@ useEffect(() => {
             <div>
               <h1 className="text-2xl font-bold">T-Shirts Collection</h1>
               <p className="text-gray-600">
-                {/* Showing {((pagination.page - 1) * pagination.Size) + 1} to{' '}
-                {Math.min(pagination.page * pagination.Size, parseInt(pagination.total))} of{' '} */}
-                {pagination.total} products
+                Showing {filteredProducts.length} of {pagination.total} products
                 {minRating > 0 && ` (Filtered by ${minRating}+ stars)`}
+                {selectedCategory !== 'all' && ` in ${selectedCategory}`}
               </p>
             </div>
 
@@ -542,9 +562,7 @@ useEffect(() => {
                           </div>
                         </div>
                         
-                        <p className="text-gray-600 text-sm items-center mt-1">
-                          
-                        </p>
+
                         
                         <div className='flex gap-1 flex-wrap mt-2'>
                           {product.size.map((s, index) => (
@@ -577,7 +595,9 @@ useEffect(() => {
               <p className="text-gray-500 mt-2">
                 {minRating > 0 
                   ? `No products match your filter of ${minRating}+ stars. Try a different rating filter.`
-                  : 'No products available in this category.'
+                  : selectedCategory !== 'all'
+                  ? `No products found in ${selectedCategory} category.`
+                  : 'No products available matching your criteria.'
                 }
               </p>
             </div>
@@ -585,7 +605,7 @@ useEffect(() => {
           
           {pagination.totalPages > 1 && filteredProducts.length > 0 && (
             <div className="flex justify-center mt-8 w-full">
-              <div className="bg-white border rounded-lg p-2 shadow-sm">
+              <div className="border rounded-lg p-2 shadow-sm">
                 {renderPagination()}
               </div>
             </div>
