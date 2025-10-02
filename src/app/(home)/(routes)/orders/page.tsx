@@ -1,12 +1,10 @@
 import { GetOrders } from '@/services/Orders'
-import React from 'react'
 import OrderTable from '../../../(dashboardLayout)/dashboard/orders/OrderTable';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Download, Filter, Plus, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Filter } from 'lucide-react';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { TOrder } from '@/app/types/Types';
 
 const Orders = async () => {

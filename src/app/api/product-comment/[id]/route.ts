@@ -1,10 +1,15 @@
 
 
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { db } from "@/db/db";
 import { productCommentTable, usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
+interface MyJwtPayload extends JwtPayload {
+    role: string;
+    userId: string;
+}
 
 
 export async function POST(req: NextRequest) {
@@ -17,12 +22,22 @@ export async function POST(req: NextRequest) {
     
         const token = authHeader.split(" ")[1];
     
-        let decoded;
+        let decoded: MyJwtPayload;
 
         try {
-            decoded = jwt.verify(token, process.env.AUTH_SECRET as string);
+            decoded = jwt.verify(
+                token,
+                process.env.AUTH_SECRET as string
+            ) as MyJwtPayload;
         } catch {
             return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+        }
+
+        if (decoded.role !== "Admin") {
+            return NextResponse.json(
+                { error: "Forbidden: Only admins can create projects" },
+                { status: 403 }
+            );
         }
     
         const userId = (decoded as any).id || (decoded as any).sub;
@@ -89,6 +104,32 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     try {
+
+        const authHeader = req.headers.get("authorization");
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        let decoded: MyJwtPayload;
+        
+        try {
+            decoded = jwt.verify(
+                token,
+                process.env.AUTH_SECRET as string
+            ) as MyJwtPayload;
+        } catch {
+            return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+        }
+
+        if (decoded.role !== "Admin") {
+            return NextResponse.json(
+                { error: "Forbidden: Only admins can create projects" },
+                { status: 403 }
+            );
+        }
 
         const id = req.nextUrl.pathname.split("/").pop();
 

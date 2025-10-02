@@ -93,3 +93,32 @@ export const UpdateOrderStatus = async (id: string, status: string) => {
         throw error;
     }
 }
+
+
+export const deleteOrder = async (id: string) => {
+    try {
+        const session = await getServerSession(authOptions);
+
+        const res = await fetch(`${process.env.BASE_URL}/order/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session?.accessToken}`
+            },
+            cache: "no-store",
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.error);
+        }
+
+        revalidateTag('orders');
+
+        return data;
+
+    } catch (error) {
+        console.log(error);
+    }
+}

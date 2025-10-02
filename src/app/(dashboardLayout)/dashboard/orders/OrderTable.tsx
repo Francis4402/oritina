@@ -7,8 +7,9 @@ import Image from 'next/image'
 import { format, parseISO } from 'date-fns'
 import { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { UpdateOrderStatus } from '@/services/Orders'
+import { deleteOrder, UpdateOrderStatus } from '@/services/Orders'
 import { toast } from 'sonner'
+import DeleteModel from '../../modelsdialogs/DeleteModel'
 
 const OrderTable = ({orders}: {orders: TOrder[]}) => {
     const [loadingStates, setLoadingStates] = useState<{[key: string]: boolean}>({});
@@ -28,6 +29,20 @@ const OrderTable = ({orders}: {orders: TOrder[]}) => {
             console.error('Failed to update order status:', error);
         } finally {
             setLoadingStates(prev => ({...prev, [orderId]: false}));
+        }
+    }
+
+    const handleDelete = async (id: string) => {
+        try {
+            const res = await deleteOrder(id);
+
+            if (res) {
+                toast.success("Order Deleted");
+            } else {
+                toast.error("Failed to delete order");
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
 
@@ -132,6 +147,15 @@ const OrderTable = ({orders}: {orders: TOrder[]}) => {
             accessorKey: 'createdAt',
             cell: ({row}) => (
                 <div>{formatDate(row.original.createdAt)}</div>
+            )
+        },
+        {
+            accessorKey: 'action',
+            header: () => <div className="text-left">Action</div>,
+            cell: ({row}) => (
+                <div className='flex space-x-2'>
+                    <DeleteModel onConfirm={() => handleDelete(row.original.id!)} />
+                </div>
             )
         }
     ]
