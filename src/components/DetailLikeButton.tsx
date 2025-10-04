@@ -64,7 +64,7 @@ export function DetailLikeBtton({ blogId }: LikeButtonProps) {
     <div>
       {
         session?.user ? (
-            <Button onClick={handleLike} className="gap-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 transform hover:scale-105 transition-all">
+            <Button onClick={handleLike} variant={"default"} size={"lg"}>
                 {
                     isLiked ? (
                         <FaHeart className="h-4 w-4" />
@@ -75,10 +75,14 @@ export function DetailLikeBtton({ blogId }: LikeButtonProps) {
           </Button>
         ) : <Button
             variant="ghost"
-            size="sm"
+            size="lg"
             onClick={handleToastNotification}
           >
-            <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              {
+                isLiked ? (
+                    <FaHeart className="h-4 w-4" />
+                ) : <Heart className="h-4 w-4" />
+              }
             <span>{likes.length}</span>
           </Button>
       }

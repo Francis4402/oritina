@@ -15,8 +15,12 @@ import { toast } from 'sonner'
 import { Form, FormControl, FormField, FormItem } from './ui/form'
 import { Textarea } from './ui/textarea'
 import { deleteblogComment, postblogcomment } from '@/services/BlogComment'
+import { useSession } from 'next-auth/react'
 
 const CommentBlogPage = ({commentList, blogId}: {commentList: blogCommentType[], blogId: string}) => {
+
+
+    const {data: session} = useSession();
 
     const form = useForm<CommentValid>({
         resolver: zodResolver(commentValidation),
@@ -109,7 +113,7 @@ const CommentBlogPage = ({commentList, blogId}: {commentList: blogCommentType[],
                                 </FormItem>
                             )} />
 
-                            <Button type='submit' className="gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+                            <Button type='submit' variant={"default"}>
                                 <Send className="h-4 w-4" />
                                 {isSubmitting ? "...Posting" : "Post Comment"}
                             </Button>
@@ -152,7 +156,9 @@ const CommentBlogPage = ({commentList, blogId}: {commentList: blogCommentType[],
                             </div>
                         </div>
 
-                            <Button onClick={() => handleDelete(comments.id!)} variant={"destructive"}>Delete</Button>
+                            {
+                                session?.user.id === comments.user.id && <Button onClick={() => handleDelete(comments.id!)} variant={"destructive"}>Delete</Button>
+                            }
                         </div>
                     </div>
                     ))

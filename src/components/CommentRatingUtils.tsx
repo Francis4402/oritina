@@ -203,7 +203,7 @@ const CommentRatingUtils = ({commentList, productId}: {commentList: productComme
                                     </FormItem>
                                 )} />
 
-                                <Button type='submit' className="gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+                                <Button type='submit' variant={"default"}>
                                     <Send className="h-4 w-4" />
                                     {isSubmitting ? "...Posting" : "Post Comment"}
                                 </Button>

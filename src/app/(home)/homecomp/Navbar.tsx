@@ -15,8 +15,8 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMounted, setIsMounted] = useState(false);
-
   const {data: session} = useSession();
+
   const { getTotalItems } = useCartStore();
 
   const navLinks = [
@@ -36,10 +36,10 @@ const Navbar = () => {
       href: "/aboutus",
       label: "About Us"
     },
-    ...(session?.user ? [{
+    {
       href: "/orders",
       label: "Orders"
-    }] : [])
+    }
   ];
 
   
