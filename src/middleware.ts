@@ -30,7 +30,6 @@ const isAllowedRoute = (path: string, allowedRoutes: string[]) => {
         if (routeParts.length !== pathParts.length) return false;
         
         for (let i = 0; i < routeParts.length; i++) {
-          
           if (routeParts[i].startsWith(':')) continue;
           if (routeParts[i] !== pathParts[i]) return false;
         }
@@ -71,14 +70,18 @@ export async function middleware(req: NextRequest) {
     }
   
     if (!token) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      const url = new URL("/login", req.url);
+      url.searchParams.set("error", "unauthenticated");
+      return NextResponse.redirect(url);
     }
   
     const userRole = token.role as string | undefined;
     const allowedRoutes = roleBasedRoutes[userRole || ""] || [];
   
     if (!isAllowedRoute(pathname, allowedRoutes)) {
-      return NextResponse.redirect(new URL("/not-found", req.url));
+      const url = new URL("/", req.url);
+      url.searchParams.set("error", "unauthorized");
+      return NextResponse.redirect(url);
     }
   
     return NextResponse.next();

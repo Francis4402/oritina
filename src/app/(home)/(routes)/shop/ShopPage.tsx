@@ -27,6 +27,7 @@ import {
 import { useCartStore } from '@/lib/store'
 import { toast } from 'sonner'
 import { fetchRatings } from '@/services/Rating'
+import { useSession } from 'next-auth/react'
 
 const ShopPage = ({ products, pagination }: { products: product[], pagination: IMeta }) => {
   const [selectedOptions, setSelectedOptions] = useState<Record<string, { size: string | null; color: string | null }>>({});
@@ -46,8 +47,18 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("producttype") || 'all')
   const [sortOption, setSortOption] = useState(searchParams.get("sort") || 'featured')
   const [viewMode, setViewMode] = useState(searchParams.get("view") || 'grid')
-  const [minRating, setMinRating] = useState(Number(searchParams.get("rating")) || 0) // Changed from minRating to rating
+  const [minRating, setMinRating] = useState(Number(searchParams.get("rating")) || 0)
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1)
+
+  const {data: session} = useSession();
+
+  const handletoastButton = () => {
+    toast.error("You are not logged in", {
+      description: "Please login to add to cart",
+    });
+
+    router.push("/login");
+  }
 
   // Initialize selected options
   useEffect(() => {
@@ -579,7 +590,13 @@ const ShopPage = ({ products, pagination }: { products: product[], pagination: I
 
                         <div className="flex items-center justify-between mt-3">
                           <span className="font-bold text-lg">${product.price}</span>
-                          <Button onClick={() => handleAddToCart(product)} size="sm">Add to Cart</Button>
+                          {
+                            session?.user ? (
+                              <Button onClick={() => handleAddToCart(product)} size="sm">Add to Cart</Button>
+                            ) : (
+                              <Button onClick={() => handletoastButton()} size="sm">Add to Cart</Button>
+                            )
+                          }
                         </div>
                       </div>
                     </div>

@@ -36,10 +36,10 @@ const Navbar = () => {
       href: "/aboutus",
       label: "About Us"
     },
-    {
+    ...(session?.user ? [{
       href: "/orders",
       label: "Orders"
-    }
+    }] : [])
   ];
 
   
@@ -132,7 +132,7 @@ const Navbar = () => {
                       ""
                     )
                   }
-                  <DropdownMenuItem onClick={() => signOut()}>
+                  <DropdownMenuItem onClick={() => signOut({callbackUrl: "/?status=logged_out"})}>
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>

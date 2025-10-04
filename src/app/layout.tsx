@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import Provider from "./Provider/Provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./utils/authOptions";
+import { ToastHandler } from "./utils/ToastHandler";
 
 
 
@@ -51,6 +52,7 @@ export default async function RootLayout({
             disableTransitionOnChange>
               <Provider session={session}>
                 <Toaster position="top-right" duration={1500} />
+                <ToastHandler />
                 {children}
               </Provider>
         </ThemeProvider>

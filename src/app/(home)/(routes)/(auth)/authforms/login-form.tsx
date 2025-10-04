@@ -35,7 +35,6 @@ export function LoginForm({
       const res = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        callbackUrl: "http://localhost:3000",
         redirect: false,
       });
 
@@ -104,12 +103,12 @@ export function LoginForm({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Button variant="outline" type="button" className="w-full" onClick={() => signIn("github", {
-                    callbackUrl: "http://localhost:3000",
+                    callbackUrl: "/?status=signed_in",
                   })}>
                     <FaGithub />
                   </Button>
                   <Button variant="outline" type="button" className="w-full" onClick={() => signIn("google", {
-                    callbackUrl: "http://localhost:3000",
+                    callbackUrl: "/?status=signed_in",
                   })}>
                     <FaGoogle/>
                   </Button>

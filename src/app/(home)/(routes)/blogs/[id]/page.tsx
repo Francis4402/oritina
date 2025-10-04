@@ -9,6 +9,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 import CommentBlogPage from '@/components/CommentBlogPage'
 import { getblogComments } from '@/services/BlogComment'
+import { toast } from 'sonner'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/utils/authOptions'
+import { DetailLikeBtton } from '@/components/DetailLikeButton'
 
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +30,8 @@ const BlogsDetails = async ({ params }: { params: Promise<{ id: string }> }) => 
   const { id } = await params
   const blog = await getBlogsbyId(id)
   const blogData = blog.data[0]
+  
+  const session = await getServerSession(authOptions);
 
   const commentList = await getblogComments(id);
   
@@ -228,20 +234,7 @@ const BlogsDetails = async ({ params }: { params: Promise<{ id: string }> }) => 
             <Card className="mt-8 shadow-lg border-0 bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <div className="flex gap-3">
-                    <Button className="gap-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 transform hover:scale-105 transition-all">
-                      <Heart className="h-4 w-4" />
-                      Like
-                    </Button>
-                    <Button variant="outline" className="gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transform hover:scale-105 transition-all">
-                      <Bookmark className="h-4 w-4" />
-                      Save
-                    </Button>
-                  </div>
-                  <Button variant="outline" className="gap-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200 dark:border-blue-800 hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-100 transform hover:scale-105 transition-all">
-                    <Share2 className="h-4 w-4" />
-                    Share Article
-                  </Button>
+                    <DetailLikeBtton blogId={id} />
                 </div>
               </CardContent>
             </Card>

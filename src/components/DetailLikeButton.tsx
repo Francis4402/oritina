@@ -6,13 +6,14 @@ import { toast } from 'sonner'
 import { getLikesById, postLike } from '@/services/Like'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { FaHeart } from 'react-icons/fa'
 
 
 interface LikeButtonProps {
   blogId: string
 }
 
-export function LikeButton({ blogId }: LikeButtonProps) {
+export function DetailLikeBtton({ blogId }: LikeButtonProps) {
   const [likes, setLikes] = useState<any[]>([]);
 
   const {data: session} = useSession();
@@ -63,13 +64,14 @@ export function LikeButton({ blogId }: LikeButtonProps) {
     <div>
       {
         session?.user ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLike}
-          >
-            <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-            <span>{likes.length}</span>
+            <Button onClick={handleLike} className="gap-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 transform hover:scale-105 transition-all">
+                {
+                    isLiked ? (
+                        <FaHeart className="h-4 w-4" />
+                    ) : <Heart className="h-4 w-4" />
+                }
+                Like
+                <span>{likes.length}</span>
           </Button>
         ) : <Button
             variant="ghost"
