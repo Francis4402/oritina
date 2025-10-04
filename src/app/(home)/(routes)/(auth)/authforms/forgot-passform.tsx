@@ -40,7 +40,7 @@ const ForgotPasswordForm = ({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
         <Card className="overflow-hidden p-0">
-            <CardContent className="grid p-0 md:grid-cols-2">
+            <CardContent>
             
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
@@ -51,14 +51,15 @@ const ForgotPasswordForm = ({
                                 Enter Your Send Email
                             </p>
                         </div>
+
                         <FormField control={form.control} name="email" render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                            <Input type="email" {...field} value={field.value || ''} placeholder="Enter Your Email" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                <Input type="email" {...field} value={field.value || ''} placeholder="Enter Your Email" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
                         )} />
 
                         <Button type="submit" className="w-full">

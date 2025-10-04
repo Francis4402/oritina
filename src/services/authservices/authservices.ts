@@ -4,7 +4,6 @@ import { ForgotPasswordType, registerType, ResetPasswordType } from "@/app/types
 
 const baseUrl = process.env.BASE_URL;
 
-console.log(baseUrl);
 
 export const register = async (data: registerType) => {
     try {
@@ -56,19 +55,19 @@ export const forgotPassword = async (data: ForgotPasswordType) => {
         if (!res.ok) {
             return {
                 success: false,
-                message: result.error || 'Registration failed',
-                error: result.error || 'Registration failed'
+                message: result.error || 'failed to send email',
+                error: result.error || 'failed to send email'
             };
         }
   
         return {
             success: true,
-            message: result.message || 'Registration successful',
+            message: result.message || 'email send successfully',
             user: result.user
         };
             
     } catch (error) {
-        console.error('Registration error:', error);
+        console.error('error:', error);
         return {
             success: false,
             message: error instanceof Error ? error.message : 'Network error',

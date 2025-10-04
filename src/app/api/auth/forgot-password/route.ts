@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
             {expiresIn: "1h"}
         );
 
-        const resetUrl = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
+        const resetUrl = `${process.env.RESET_URL}/reset-password?token=${resetToken}`;
 
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,

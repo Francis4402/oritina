@@ -53,7 +53,7 @@ const ResetPasswordForm = () => {
 
   return (
     <Card className="overflow-hidden p-0">
-      <CardContent className="grid p-0 md:grid-cols-2">
+      <CardContent>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
