@@ -97,3 +97,12 @@ export const orderTable = pgTable("orders", {
   status: varchar("status").notNull().default("Pending"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export const messageTable = pgTable("message", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", {length: 255}).notNull(),
+  phone: varchar("phone", {length: 11}).notNull(),
+  message: varchar("message", {length: 255}).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+})

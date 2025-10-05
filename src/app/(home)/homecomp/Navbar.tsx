@@ -37,6 +37,14 @@ const Navbar = () => {
       label: "About Us"
     },
     {
+      href: "/services",
+      label: "Services"
+    },
+    {
+      href: "/contactus",
+      label: "ContactUs"
+    },
+    {
       href: "/orders",
       label: "Orders"
     }
@@ -63,17 +71,6 @@ const Navbar = () => {
             {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </button>
 
-          
-          <div className="hidden md:flex relative">
-            <Input 
-              type='text' 
-              placeholder='Search...' 
-              className='w-fit pr-10 bg-gray-800 text-white border-gray-700'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <FaSearch className="absolute right-3 top-3 text-gray-400" />
-          </div>
 
 
           <h1 className='poppins scroll-m-20 text-white text-center text-2xl md:text-4xl font-extrabold tracking-tight'>ORIANA</h1>
@@ -85,10 +82,12 @@ const Navbar = () => {
               <FaSearch size={20} />
             </button>
 
-            <Link href={"/wishlist"} className='hidden md:flex items-center gap-2 text-white'>
-              <FaHeart />
-              <p className="hidden lg:block">WishList</p>
-            </Link>
+            <Button variant={"outline"}>
+              <Link href={"/wishlist"} className='hidden md:flex items-center gap-2 text-white'>
+                <FaHeart />
+                <p className="hidden lg:block">WishList</p>
+              </Link>
+            </Button>
 
             {
               session && (
@@ -187,18 +186,16 @@ const Navbar = () => {
             
             
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col space-y-3">
-              <Link 
-                href={"/wishlist"} 
-                className='flex items-center gap-2 text-gray-800 dark:text-white'
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <FaHeart />
-                <p>WishList</p>
-              </Link>
-
-              {
-
-              }
+              <Button variant={"outline"}>
+                <Link 
+                  href={"/wishlist"} 
+                  className='flex items-center gap-2 text-gray-800 dark:text-white'
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <FaHeart />
+                  <p>WishList</p>
+                </Link>
+              </Button>
               
               <div className="pt-2">
                 <ModeToggle />

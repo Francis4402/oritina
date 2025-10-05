@@ -46,6 +46,13 @@ export interface ResetPasswordType {
   newPassword: string;
 };
 
+export interface messageType {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
 
 export interface product {
     id?: string;
