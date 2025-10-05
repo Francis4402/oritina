@@ -78,12 +78,12 @@ const Navbar = () => {
           {/* Right side icons */}
           <div className='flex items-center gap-4'>
             
-            <button className="md:hidden text-white">
+            {/* <button className="md:hidden text-white">
               <FaSearch size={20} />
-            </button>
+            </button> */}
 
             <Button variant={"outline"}>
-              <Link href={"/wishlist"} className='hidden md:flex items-center gap-2 text-white'>
+              <Link href={"/wishlist"} className='hidden md:flex items-center gap-2'>
                 <FaHeart />
                 <p className="hidden lg:block">WishList</p>
               </Link>
