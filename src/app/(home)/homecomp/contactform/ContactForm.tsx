@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { sendMessage } from '@/services/SendMessages'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,8 +18,8 @@ const ContactForm = () => {
     const form = useForm({
         resolver: zodResolver(contactusValidationSchema),
         defaultValues: {
-            name: "",
-            email: "",
+            name: session?.user?.name || "",
+            email: session?.user?.email || "",
             phone: "",
             message: ""
         }
@@ -39,6 +38,7 @@ const ContactForm = () => {
             } else {
                 toast.error("Message Send Failed");
             }
+
         } catch (error) {
             console.log(error);
         }
@@ -56,11 +56,10 @@ const ContactForm = () => {
             <CardContent className="p-8">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
+                        <div>
                             <FormField control={form.control} name='name' render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>Full Name</FormLabel>
                                     <FormControl>
                                         <Input type='text' {...field} value={field.value} placeholder='Enter Your Name' />
                                     </FormControl>

@@ -9,6 +9,43 @@ interface MyJwtPayload extends JwtPayload {
     userId: string;
 }
 
+export async function GET(req: NextRequest) {
+    try {
+        const authHeader = req.headers.get("authorization");
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        let decoded: MyJwtPayload;
+        try {
+            decoded = jwt.verify(
+                token,
+                process.env.AUTH_SECRET as string
+            ) as MyJwtPayload;
+        } catch {
+            return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+        }
+
+
+        if (decoded.role !== "Admin") {
+            return NextResponse.json(
+                { error: "Forbidden: Only admins can create projects" },
+                { status: 403 }
+            );
+        }
+
+        const messages = await db.select().from(messageTable)
+
+        return NextResponse.json(messages);
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
+    }
+}
+
 export async function POST(req: NextRequest){
     try {
         const authHeader = req.headers.get("authorization");
@@ -31,6 +68,7 @@ export async function POST(req: NextRequest){
 
         const newMessages = await db.insert(messageTable).values({
             name: body.name,
+            email: body.email,
             phone: body.phone,
             message: body.message,
         });
@@ -51,7 +89,6 @@ export async function POST(req: NextRequest){
             html: `
               <h3>New Message</h3>
               <p><strong>Name:</strong> ${body.name}</p>
-              <p><strong>Email:</strong> ${body.email}</p>
               <p><strong>Phone:</strong> ${body.phone}</p>
               <p><strong>Message:</strong> ${body.message}</p>
             `,

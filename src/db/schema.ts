@@ -101,6 +101,7 @@ export const orderTable = pgTable("orders", {
 export const messageTable = pgTable("message", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", {length: 255}).notNull(),
+  email: varchar("email", {length: 255}).notNull(),
   phone: varchar("phone", {length: 11}).notNull(),
   message: varchar("message", {length: 255}).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
