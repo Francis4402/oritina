@@ -181,7 +181,7 @@ const Navbar = () => {
                   <DropdownMenuContent align='end' className='poppins w-48'>
                     <DropdownMenuItem className="flex flex-col items-start cursor-default">
                       <span className="font-semibold">{session.user.name}</span>
-                      <span className="text-sm text-gray-500">{session.user.email}</span>
+                      {/* <span className="text-sm text-gray-500">{session.user.email}</span> */}
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="w-full cursor-pointer">
