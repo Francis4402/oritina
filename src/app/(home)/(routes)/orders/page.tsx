@@ -1,14 +1,15 @@
 import { GetOrders } from '@/services/Orders'
-import OrderTable from '../../../(dashboardLayout)/dashboard/orders/OrderTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { TOrder } from '@/app/types/Types';
+import HomeOrderTable from './HomeOrderTable';
 
 const Orders = async () => {
     const orders: TOrder[] = await GetOrders();
+
 
     // Calculate some stats for the header
     const totalOrders = orders.length;
@@ -161,37 +162,37 @@ const Orders = async () => {
                         
                         <TabsContent value="all" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
-                                <OrderTable orders={orders} />
+                                <HomeOrderTable orders={orders} />
                             </div>
                         </TabsContent>
                         
                         <TabsContent value="Pending" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
-                                <OrderTable orders={orders.filter(order => order.status === 'Pending')} />
+                                <HomeOrderTable orders={orders.filter(order => order.status === 'Pending')} />
                             </div>
                         </TabsContent>
 
                         <TabsContent value="Shipped" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
-                                <OrderTable orders={orders.filter(order => order.status === 'Shipped')} />
+                                <HomeOrderTable orders={orders.filter(order => order.status === 'Shipped')} />
                             </div>
                         </TabsContent>
 
                         <TabsContent value="Delivered" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
-                                <OrderTable orders={orders.filter(order => order.status === 'Delivered')} />
+                                <HomeOrderTable orders={orders.filter(order => order.status === 'Delivered')} />
                             </div>
                         </TabsContent>
                         
                         <TabsContent value="Completed" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
-                                <OrderTable orders={orders.filter(order => order.status === 'Completed')} />
+                                <HomeOrderTable orders={orders.filter(order => order.status === 'Completed')} />
                             </div>
                         </TabsContent>
                         
                         <TabsContent value="Cancelled" className="space-y-4 mt-4">
                             <div className="overflow-x-auto">
-                                <OrderTable orders={orders.filter(order => order.status === 'Cancelled')} />
+                                <HomeOrderTable orders={orders.filter(order => order.status === 'Cancelled')} />
                             </div>
                         </TabsContent>
                     </Tabs>

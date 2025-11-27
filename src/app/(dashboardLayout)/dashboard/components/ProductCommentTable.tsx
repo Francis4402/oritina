@@ -7,19 +7,20 @@ import { ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import DeleteModel from '../../modelsdialogs/DeleteModel'
+import { deleteProductComment } from '@/services/ProductComments'
 
 
-const CommentTable = ({comment}: {comment: blogCommentType[]}) => {
+const ProductCommentTable = ({comment}: {comment: blogCommentType[]}) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async (id: string) => {
         setIsDeleting(true);
 
         try {
-            const res = await deleteblogComment(id);
+            const res = await deleteProductComment(id);
 
             if (res) {
-                toast.success("Blog comment Deleted");
+                toast.success("Product Comment Deleted");
             } else {
                 toast.error(res.error || "Failed to delete comment");
             }
@@ -55,4 +56,4 @@ const CommentTable = ({comment}: {comment: blogCommentType[]}) => {
   )
 }
 
-export default CommentTable
+export default ProductCommentTable
