@@ -108,22 +108,21 @@ const HomeOrderTable = ({orders}: {orders: TOrder[]}) => {
             cell: ({row}) => {
                 const order = row.original;
                 const isLoading = loadingStates[order.id] || false;
+                const isCanceled = order.status === 'Canceled';
                 const isShipped = order.status === 'Shipped';
                 
                 return (
-                    <Select 
-                        value={order.status} 
-                        onValueChange={(value) => handleStatusChange(order.id, value)}
-                        disabled={isLoading || isShipped}
+                    <button
+                        onClick={() => handleStatusChange(order.id, 'Canceled')}
+                        disabled={isLoading || isCanceled || isShipped}
+                        className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                            isLoading || isCanceled || isShipped
+                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                : 'bg-red-500 text-white hover:bg-red-600'
+                        }`}
                     >
-                        <SelectTrigger className="w-[130px]">
-                            <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Pending">Pending</SelectItem>
-                            <SelectItem value="Canceled">Cencel</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        {isLoading ? 'Canceling...' : 'Cancel'}
+                    </button>
                 )
             }
         },
