@@ -85,11 +85,13 @@ export const getblogComments = async (id: string) => {
 
 export const deleteblogComment = async (id: string) => {
     try {
-        
+        const session = await getServerSession(authOptions);
+
         const res = await fetch(`${baseUrl}/comment/${id}`, {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${session?.accessToken}`
             },
             cache: 'no-store'
         });

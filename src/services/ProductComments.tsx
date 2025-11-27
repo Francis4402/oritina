@@ -85,11 +85,13 @@ export const getProductComment = async (id: string) => {
 
 export const deleteProductComment = async (id: string) => {
     try {
-        
+        const session = await getServerSession(authOptions);
+
         const res = await fetch(`${baseUrl}/product-comment/${id}`, {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${session?.accessToken}`
             },
             cache: 'no-store'
         });

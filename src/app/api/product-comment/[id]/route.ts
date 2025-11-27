@@ -33,12 +33,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Invalid token" }, { status: 401 });
         }
 
-        if (decoded.role !== "Admin") {
-            return NextResponse.json(
-                { error: "Forbidden: Only admins can create projects" },
-                { status: 403 }
-            );
-        }
     
         const userId = (decoded as any).id || (decoded as any).sub;
 
@@ -124,12 +118,6 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ error: "Invalid token" }, { status: 401 });
         }
 
-        if (decoded.role !== "Admin") {
-            return NextResponse.json(
-                { error: "Forbidden: Only admins can create projects" },
-                { status: 403 }
-            );
-        }
 
         const id = req.nextUrl.pathname.split("/").pop();
 

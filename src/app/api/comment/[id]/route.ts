@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ 
             message: "Comment added successfully",
-            comment: newComment 
+            comment: newComment
         }, { status: 201 });
     } catch (error) {
         console.error("Like error:", error);
