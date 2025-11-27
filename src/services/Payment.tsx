@@ -3,7 +3,7 @@ import { CartItem } from "@/app/types/Types";
 
 export const paymentService = async (cart: CartItem[], total: number) => {
   try {
-    const res = await fetch('http://localhost:3000/api/checkout_sessions', {
+    const res = await fetch('https://oritina.vercel.app/api/checkout_sessions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
