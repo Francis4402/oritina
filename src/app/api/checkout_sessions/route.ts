@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     }
 
     const headersList = await headers()
-    const origin = headersList.get('origin') || 'http://localhost:3000'
+    const origin = headersList.get('origin') || 'https://oritina.vercel.app'
 
     // Calculate subtotal from cart
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);

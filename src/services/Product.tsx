@@ -2,6 +2,8 @@
 
 
 import { product } from "@/app/types/Types";
+import { authOptions } from "@/app/utils/authOptions";
+import { getServerSession } from "next-auth";
 import { revalidateTag } from "next/cache";
 
 
@@ -71,10 +73,13 @@ export const getProduct = async (id: string) => {
 
 export const createProduct = async (product: product) => {
     try {
+        const session = await getServerSession(authOptions);
+
         const res = await fetch(`${baseurl}/products`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${session?.accessToken}`
             },
             body: JSON.stringify(product),
             cache: 'no-store',
@@ -96,10 +101,13 @@ export const createProduct = async (product: product) => {
 
 export const updateProduct = async (product: product) => {
     try {
+        const session = await getServerSession(authOptions);
+
         const res = await fetch(`${baseurl}/products/${product.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${session?.accessToken}`
             },
             body: JSON.stringify(product),
             cache: 'no-store',
@@ -121,12 +129,14 @@ export const updateProduct = async (product: product) => {
 
 export const deleteProduct = async (id: string) => {
     try {
+        const session = await getServerSession(authOptions);
+        
         const res = await fetch(`${baseurl}/products/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${session?.accessToken}`
             },
-            cache: 'no-store',
         });
 
         const data = await res.json();

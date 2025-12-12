@@ -45,7 +45,7 @@ export const useCartStore = create<CartStore>()(
                 getCartItemKey(item.id, item.selectedColor, item.selectedSize) !==
                 getCartItemKey(id, selectedColor, selectedSize)
             ),
-          })),
+        })),
 
         updateQuantity: (id, quantity, selectedColor, selectedSize) =>
           set((state) => ({

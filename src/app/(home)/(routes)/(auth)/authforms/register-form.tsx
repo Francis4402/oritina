@@ -50,7 +50,7 @@ export function RegisterForm({
             const login = await signIn("credentials", {
               email: data.email,
               password: data.password,
-              callbackUrl: "http://localhost:3000",
+              callbackUrl: "https://oritina.vercel.app",
               redirect: false,
             });
 
@@ -160,12 +160,12 @@ export function RegisterForm({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Button variant="outline" type="button" className="w-full" onClick={() => signIn("github", {
-                    callbackUrl: "http://localhost:3000",
+                    callbackUrl: "https://oritina.vercel.app",
                   })}>
                     <FaGithub />
                   </Button>
                   <Button variant="outline" type="button" className="w-full" onClick={() => signIn("google", {
-                    callbackUrl: "http://localhost:3000",
+                    callbackUrl: "https://oritina.vercel.app",
                   })}>
                     <FaGoogle />
                   </Button>
