@@ -121,7 +121,7 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <h1 className='poppins text-white text-2xl md:text-3xl font-extrabold tracking-tight hover:opacity-90 transition-opacity'>
-                ORIANA
+                ORITINA
               </h1>
             </Link>
 
