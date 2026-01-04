@@ -9,16 +9,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 import CommentBlogPage from '@/components/CommentBlogPage'
 import { getblogComments } from '@/services/BlogComment'
-import { toast } from 'sonner'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/utils/authOptions'
 import { DetailLikeBtton } from '@/components/DetailLikeButton'
 
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const blog = await getBlogsbyId(id)
-  const blogData = blog.data[0]
+  const { id } = await params;
+  const blog = await getBlogsbyId(id);
+  const blogData = blog.data[0];
 
   return {
     title: blogData.title,
@@ -26,12 +25,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-const BlogsDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
+const BlogsDetails = async ({ params } : { params: Promise<{ id: string }> }) => {
   const { id } = await params
   const blog = await getBlogsbyId(id)
   const blogData = blog.data[0]
-  
-  const session = await getServerSession(authOptions);
 
   const commentList = await getblogComments(id);
   
